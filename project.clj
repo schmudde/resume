@@ -1,5 +1,5 @@
 (defproject resume "0.1.0-SNAPSHOT"
-  :description "This generates a HTML resume. `lein run > test.html` creates the file. Use Prince to turn the HTML file into a PDF: `prince test.html -o test.pdf`"
+  :description "This generates a HTML resume. `lein run > test.html` creates the file. Use Prince to turn the HTML file into a PDF: `prince --page-size=A4 --page-margin=0mm resume.html -o resume.pdf`"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}

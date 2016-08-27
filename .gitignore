@@ -9,5 +9,6 @@ pom.xml.asc
 /.nrepl-port
 /resources/resume.html
 /resources/css/bootstrap-3.3.7/*
+/resources/*.pdf
 .hgignore
 .hg/

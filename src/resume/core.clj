@@ -12,17 +12,8 @@
 (defn get-data []
   (load-string (slurp "https://raw.githubusercontent.com/schmudde/schmud-de/master/src/schmud_de/models.clj")))
 
-
-;;(load-string data-set)
-;; schmud-de.models/projects-db
-
-;; http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
-;; http://stackoverflow.com/questions/7756909/in-clojure-1-3-how-to-read-and-write-a-file
-;; http://www.lispcast.com/clojure-regex
-;; user=> (def matcher (re-matcher #"\(def.*?\}?\)" "(def x 1}) (def y 2})"))
 ;; (def matcher (re-matcher #"(?s)\(def.*?\}+?\)" database))
-;; (def matcher (re-matcher #"(?s)\(def.*?\}?\)" "(def x 1}) (def y 2})"))
-;; (re-find matcher)
+
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; General Layout ;;
