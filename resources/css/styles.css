@@ -1,0 +1,121 @@
+
+
+/* @base-bg: #fdf6b6; /\* yellow *\/ */
+/* @dark-compliment: #2700B2; /\* dark blue *\/ */
+/* @lite-complement: #6B29FF; /\* light blue *\/ */
+/* @contrasting-red: #946370; /\* dark red *\/ */
+/* Colors: http://adobe.ly/2amTsZQ */
+
+body {
+    font-family: 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;
+    color: #444;
+    background: #f5f5f5 !important;
+}
+
+.container {
+    padding-left: 2em;
+    padding-right: 2em;
+    padding-top: 2.5em;
+}
+
+header { padding-bottom: 1.5em;  padding-top: 2.5em; margin-bottom: 2em;}
+header h1, header h2 {
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin: 0px;
+    font-weight: 100 !important;
+    color: #673BFF !important;
+}
+header h2 { letter-spacing: 2px !important;;}
+header h3 { margin: 0px; }
+h3, h4 { color: #333; }
+h4.section-header { padding-bottom: 0.8em; }
+h4.experience-section-header { padding-bottom: 0em; }
+
+h1 { color: #2700B2 !important; }
+h2 { color: #6B29FF !important; }
+h2 small, h3 small, h4 small, .contact-info, table { color: #946370 !important; }
+
+p.section-header { color: #946370 !important; font-size: 11px; }
+
+table { font-size: 12px; }
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+    border-top: none;
+    line-height: 1;
+    padding: 4px;
+}
+
+#inner { background: #fdf6b6 !important; border-top: solid #673BFF 8px; }
+/* #bd { background: #fdf6b6 !important; } */
+#bd h2, #bd h3, #bd h4 { margin: 0 0 8px; }
+
+footer > .container { border-top: solid #673BFF 2px; padding: 10px; }
+
+.highlight { color: #6B29FF !important; }
+.two-col-list {
+    width: 49%;
+    padding: 0 20px;
+    float: left;}
+
+.two-col-list p:first-child {
+    margin: 0;
+}
+
+@media print {
+    body {
+        background: #fdf6b6 !important;
+    }
+
+    header h1, header h2 { text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0px;
+            font-weight: lighter;
+            color: #000;
+          }
+
+    /* override Bootstrap defaults */
+    .table td,
+    .table th,
+    span.glyphicon {
+      background-color: #fdf6b6 !important;
+      color: #946370 !important;
+     }
+
+    a,
+    a:link,
+    a:visited {
+        border: none;
+        color: black;
+    }
+
+    .container {
+        width: auto;
+    }
+
+    .two-col-list {
+        padding: 0;
+    }
+}
+
+@page { size: A4 }
+
+/* CSS Print Guides                                                       */
+/* https://www.smashingmagazine.com/2015/01/designing-for-print-with-css/ */
+/* https://www.smashingmagazine.com/2013/03/tips-and-tricks-for-print-style-sheets/ */
+
+/* //-- core typography and style -- */
+a { color: #990003 }
+a:hover { text-decoration: none; }
+
+
+#bd, #ft { margin-bottom: 2em; }
+
+#ft p { margin-bottom: 0; text-align: center;   }
+
+
+/* //-- section styles -- */
+
+a#pdf { display: block; float: left; background: #666; color: white; padding: 6px 50px 6px 12px; margin-bottom: 6px; text-decoration: none;  }
+a#pdf:hover { background: #222; }
+
+.job { margin-bottom: 1em; padding-bottom: 1em; }
