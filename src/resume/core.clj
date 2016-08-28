@@ -2,7 +2,6 @@
   (:gen-class)
   (:refer-clojure :rename {map clj-map meta clj-meta time clj-time})
   (:require [clj-template.html5 :refer :all]
-            [resume.models :as m]
             [clojure.math.numeric-tower :as math]))
 
 ;;;;;;;;;;;;;;;;;;;;
@@ -103,14 +102,14 @@
 
 
 (def experience
-  (fn [proj] (let [jack-machine (project-finder "Jack and the Machine" (m/projects-db :projects) "title")
-               borderless   (project-finder "Borderless" (m/projects-db :projects) "title")
-               rhythm       (project-finder "The Rhythm of Time" (m/projects-db :projects) "title")
-               distant      (project-finder "Distant Apologies" (m/projects-db :projects) "title")
-               btf          (project-finder "Beyond the Frame" (m/employment-db :employers) "employer")
-               penguin      (project-finder "Penguin Random House" (m/employment-db :employers) "employer")
-               netgalley    (project-finder "NetGalley" (m/employment-db :employers) "employer")
-               ef-sharp     (project-finder "F#" (m/employment-db :employers) "employer")]
+  (fn [proj employ] (let [jack-machine (project-finder "Jack and the Machine" (proj :projects) "title")
+               borderless   (project-finder "Borderless" (proj :projects) "title")
+               rhythm       (project-finder "The Rhythm of Time" (proj :projects) "title")
+               distant      (project-finder "Distant Apologies" (proj :projects) "title")
+               btf          (project-finder "Beyond the Frame" (employ :employers) "employer")
+               penguin      (project-finder "Penguin Random House" (employ :employers) "employer")
+               netgalley    (project-finder "NetGalley" (employ :employers) "employer")
+               ef-sharp     (project-finder "F#" (employ :employers) "employer")]
 
            (div {:class "row"}
                 (section-header "Selected Experience" "experience-section-header")
@@ -134,7 +133,7 @@
 ;; Update database
 
 (def academy
-  (fn [exhib talk] (let [nu (project-finder "Northwestern University" (m/exhibitions-db :education) "org")
+  (fn [exhib talk] (let [nu (project-finder "Northwestern University" (exhib :education) "org")
                uni (project-finder "University of Northern Iowa" (exhib :education) "org")
                ai (project-finder "Illinois Institute of Art" (talk :talks) "subtitle")]
            (div {:class "row"}
@@ -207,7 +206,7 @@
                (talent)
                (hr-)
 
-               (experience (data-set :projects))
+               (experience (data-set :projects) (data-set :employment))
                (hr-)
 
                ;; 3 columns of academic experience
