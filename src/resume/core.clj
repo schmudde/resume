@@ -2,7 +2,8 @@
   (:gen-class)
   (:refer-clojure :rename {map clj-map meta clj-meta time clj-time})
   (:require [clj-template.html5 :refer :all]
-            [clojure.math.numeric-tower :as math]))
+            [clojure.math.numeric-tower :as math]
+            [resume.bio :as bio]))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Get Data       ;;
@@ -58,32 +59,31 @@
   (fn []
     (header {:class "row"}
             (div {:class "col-sm-6"}
-                 (h1 "D. Schm&uuml;dde")
-                 (h2 "Creative Technologist"))
+                 (h1 (bio/biography :name))
+                 (h2 (bio/biography :job-title)))
             (div {:class "col-sm-6"}
                  (div {:class "contact-info"}
                       (table {:class "table"}
-                             (tr (td (span {:class "glyphicon glyphicon-envelope" :aria-hidden "true"}) "&nbsp;&nbsp;d@schmud.de")
-                                 (td (span {:class "glyphicon glyphicon-globe" :aria-hidden "true"}) "&nbsp;&nbsp;http://schmud.de"))
-                             (tr (td (span {:class "glyphicon glyphicon-earphone" :aria-hidden "true"}) "&nbsp;&nbsp;312.451.5952")
-                                 (td (span {:class "glyphicon glyphicon-home" :aria-hidden "true"}) "&nbsp;&nbsp;Brooklyn, NY")))
+                             (tr (td (span {:class "glyphicon glyphicon-envelope" :aria-hidden "true"}) "&nbsp" (bio/biography :email))
+                                 (td (span {:class "glyphicon glyphicon-globe" :aria-hidden "true"}) "&nbsp;" (bio/biography :website)))
+                             (tr (td (span {:class "glyphicon glyphicon-earphone" :aria-hidden "true"}) "&nbsp" (bio/biography :phone))
+                                 (td (span {:class "glyphicon glyphicon-home" :aria-hidden "true"}) "&nbsp;" (bio/biography :city))))
                       )))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; 3 Talents      ;;
 ;;;;;;;;;;;;;;;;;;;;
 
+(def talent-column (fn [talent]
+                     (column-layout ((bio/talent (keyword talent)) :title)
+                                    ((bio/talent (keyword talent)) :domain)
+                                    ((bio/talent (keyword talent)) :desc))))
+
 (def talent
   (fn [] (div {:class "row"}
-              (column-layout "Creative"
-                             "Director + Producer"
-                             "I have collaborated with others to earn film festival selections, awards, and cable distribution.")
-              (column-layout "Programmer"
-                             "Web + Installation"
-                             "I work with small teams to build websites and digital installation experiences worldwide.")
-              (column-layout "Educator"
-                             "Professor + Speaker"
-                             "I speak on issues relating to digital culture and have taught as an Associate Professor across mediums."))))
+              (talent-column "creative")
+              (talent-column "programmer")
+              (talent-column "educator"))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Experience     ;;

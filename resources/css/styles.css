@@ -31,6 +31,8 @@ header h3 { margin: 0px; }
 h3, h4 { color: #333; }
 h4.section-header { padding-bottom: 0.8em; }
 h4.experience-section-header { padding-bottom: 0em; }
+h4 > small { font-size: 10.25px; }
+
 
 h1 { color: #2700B2 !important; }
 h2 { color: #6B29FF !important; }
