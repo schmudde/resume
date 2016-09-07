@@ -94,12 +94,22 @@
                                       (h4 title (small technology))
                                       (p description))))
 
+(defn desc-itemizer [matcher-object points]
+  "I iterate through a java.util.regex.Matcher.find() object and turn each returned string into an HTML list item."
+  (let [single-point (re-find matcher-object)]
+    (if (some? single-point)
+      (desc-itemizer matcher-object (str points (li {:class "qualification"} single-point)))
+      points)))
+
+(defn desc-layout [description]
+  "regex to find the semicolon"
+  (ul {:class "qualifications"} (desc-itemizer (re-matcher #"\w[^;]+" description) "")))
+
 (defn experience-layout [employer]
   (div {:class "col-xs-12 job"}
        (h2 (employer :employer) (small {:class "pull-right"} (employer :date)))
        (h3 (employer :title) (small (employer :technology)))
-       (p (employer :desc))))
-
+       (desc-layout (employer :desc))))
 
 (def experience
   (fn [proj employ] (let [jack-machine (project-finder "Jack and the Machine" (proj :projects) "title")
@@ -117,7 +127,7 @@
                 (div {:class "col-xs-12 job"}
                      (h2 (btf :employer) (small {:class "pull-right"} (btf :date)))
                      (h3 (btf :title) (small (btf :technology)))
-                     (p (btf :desc))
+                     (desc-layout (btf :desc))
                      (beyond-the-frame (jack-machine :title) (jack-machine :technology) (jack-machine :desc))
                      (beyond-the-frame (borderless :title) (borderless :technology) (borderless :desc))
                      (beyond-the-frame (rhythm :title) (rhythm :technology) (rhythm :desc))
@@ -209,13 +219,13 @@
                (experience (data-set :projects) (data-set :employment))
                (hr-)
 
-               ;; 3 columns of academic experience
-               (academy (data-set :exhibitions) (data-set :talks))
-               (hr-)
-
                (awards (data-set :exhibitions))
                (hr-)
 
-               (publications (data-set :exhibitions))))
+               (publications (data-set :exhibitions))
+               (hr-)
+
+               ;; 3 columns of academic experience
+               (academy (data-set :exhibitions) (data-set :talks))))
 
      (resume-footer))))))

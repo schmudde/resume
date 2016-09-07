@@ -26,6 +26,7 @@ header h1, header h2 {
     font-weight: 100 !important;
     color: #673BFF !important;
 }
+
 header h2 { letter-spacing: 2px !important;;}
 header h3 { margin: 0px; }
 h3, h4 { color: #333; }
@@ -63,6 +64,14 @@ footer > .container { border-top: solid #673BFF 2px; padding: 10px; }
     margin: 0;
 }
 
+.qualifications {
+    padding-left: 20px;
+    list-style-type: '- ';
+}
+
+.qualification {
+
+}
 @media print {
     body {
         background: #fdf6b6 !important;
