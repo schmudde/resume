@@ -12,9 +12,6 @@
 (defn get-data []
   (load-string (slurp "https://raw.githubusercontent.com/schmudde/schmud-de/master/src/schmud_de/models.clj")))
 
-;; (def matcher (re-matcher #"(?s)\(def.*?\}+?\)" database))
-
-
 ;;;;;;;;;;;;;;;;;;;;
 ;; General Layout ;;
 ;;;;;;;;;;;;;;;;;;;;
@@ -49,7 +46,8 @@
 (def resume-footer
   (fn [] (footer {:class "footer"}
                  (div {:class "container"}
-                      (p "Made With Clojure")))))
+                      (p "Made With Clojure &nbsp;|&nbsp; See the Source Code: "
+                         (a {:href "http://bit.ly/2bWWDHc"} "http://bit.ly/2bWWDHc"))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Header         ;;
@@ -84,6 +82,14 @@
               (talent-column "creative")
               (talent-column "programmer")
               (talent-column "educator"))))
+
+(def bio-summary
+  (fn []
+    (div {:class "row"}
+         (section-header "Summary")
+         (div {:class "col-xs-12"}
+              (p (bio/biography :summary))))))
+
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Experience     ;;
@@ -212,8 +218,9 @@
 
           ;; document body
           (div {:id "bd"}
-               ;; 3 columns listing talents
-               (talent)
+
+               ;;(talent) ;; alternative header: 3 columns listing talents
+               (bio-summary) ;; summary header
                (hr-)
 
                (experience (data-set :projects) (data-set :employment))

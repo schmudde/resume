@@ -8,7 +8,7 @@
    :website "http://schmud.de"
    :phone "312.451.5952"
    :city "Brooklyn, NY"
-   :summary "I'm looking to work with imaginative people that are cooking up new ways to leverage technology in an effort to better share experiences and stories and empower individuals."})
+   :summary "I’m looking to produce groundbreaking experiences with others who think beyond the limitations of platforms and see the synergy between mobile, television, interactive, and site-specific work. I’m an accomplished producer and director with a strong social media presence, a technical grounding in many computer languages and video formats, and a creative mind with strong aesthetic principles."})
 
 (def talent
   {:creative {:title "Creative"
