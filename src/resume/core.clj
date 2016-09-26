@@ -97,7 +97,7 @@
 
 (def beyond-the-frame
   (fn [title technology description] (div {:style "padding-left: 2.5em;"}
-                                      (h4 title (small technology))
+                                      (h4 title (small "BUILT USING: " technology))
                                       (p description))))
 
 (defn desc-itemizer [matcher-object points]
@@ -114,7 +114,7 @@
 (defn experience-layout [employer]
   (div {:class "col-xs-12 job"}
        (h2 (employer :employer) (small {:class "pull-right"} (employer :date)))
-       (h3 (employer :title) (small (employer :technology)))
+       (h3 (employer :title) (small "TECHNOLOGIES: " (employer :technology)))
        (desc-layout (employer :desc))))
 
 (def experience
@@ -129,10 +129,9 @@
 
            (div {:class "row"}
                 (section-header "Selected Experience" "experience-section-header")
-                (p {:class "text-center section-header"} "Technologies I Used in Red")
                 (div {:class "col-xs-12 job"}
                      (h2 (btf :employer) (small {:class "pull-right"} (btf :date)))
-                     (h3 (btf :title) (small (btf :technology)))
+                     (h3 (btf :title) (small "TECHNOLOGIES: " (btf :technology)))
                      (desc-layout (btf :desc))
                      (beyond-the-frame (jack-machine :title) (jack-machine :technology) (jack-machine :desc))
                      (beyond-the-frame (borderless :title) (borderless :technology) (borderless :desc))
