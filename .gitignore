@@ -8,6 +8,8 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 /resources/resume.html
+/resources/resume-academic.html
+/resources/resume-industry.html
 /resources/css/bootstrap-3.3.7/*
 /resources/*.pdf
 .hgignore

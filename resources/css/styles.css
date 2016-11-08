@@ -69,9 +69,14 @@ footer > .container { border-top: solid #673BFF 2px; padding: 10px; }
     list-style-type: '- ';
 }
 
-.qualification {
-
+.job blockquote {
+    display: none;
 }
+
+.job p .small {
+    font-size: 75%;
+}
+
 @media print {
     body {
         background: #fdf6b6 !important;
@@ -105,6 +110,10 @@ footer > .container { border-top: solid #673BFF 2px; padding: 10px; }
 
     .two-col-list {
         padding: 0;
+    }
+
+    .page-breaker {
+        page-break-before: always;
     }
 }
 

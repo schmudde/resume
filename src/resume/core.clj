@@ -16,10 +16,37 @@
 ;; General Layout ;;
 ;;;;;;;;;;;;;;;;;;;;
 
+(defn desc-itemizer [matcher-object points]
+  "I iterate through a java.util.regex.Matcher.find() object and turn each returned string into an HTML list item."
+  (let [single-point (re-find matcher-object)]
+    (if (some? single-point)
+      (desc-itemizer matcher-object (str points (li {:class "qualification"} single-point)))
+      points)))
+
+(defn desc-layout [description]
+  "I create a HTML list. I expect a string of data delimited by semicolons."
+  (ul {:class "qualifications"} (desc-itemizer (re-matcher #"\w[^;]+" description) "")))
+
 (defn project-finder [search-term db keyword-search]
   (if (= ((first db) (keyword keyword-search)) search-term)
     (first db)
     (project-finder search-term (rest db) keyword-search)))
+
+(defn column-layout [talent title description]
+  "I take parameters and build a single entry"
+  (div {:class "col-xs-4"}
+       (h2 talent)
+       (h3 title)
+       (p description)))
+
+(defn single-column
+  "I take parameters and build a single entry"
+  [title subtitle description date & [class-synopsis bullet-points]]
+  (div {:class "col-xs-12 job"}
+       (h2 title)
+       (h3 description (small subtitle) (small {:class "pull-right"} date))
+       (p class-synopsis)
+       (if (nil? bullet-points) nil (desc-layout bullet-points))))
 
 (defn achievement-list-builder [achievements html-out template]
   (if (seq achievements)
@@ -28,13 +55,9 @@
                               template)
     html-out))
 
-(defn column-layout [talent title description]
-  (div {:class "col-xs-4"}
-       (h2 talent)
-       (h3 title)
-       (p description)))
-
-(defn two-col-list [list-column template]
+(defn two-col-list
+  "I take a list and build out an entire column"
+  [list-column template]
   (div {:class "two-col-list"}
        (ul {:class "list-unstyled"}
         (achievement-list-builder list-column  "" template))))
@@ -49,8 +72,14 @@
                       (p "Made With Clojure &nbsp;|&nbsp; See the Source Code: "
                          (a {:href "http://bit.ly/2bWWDHc"} "http://bit.ly/2bWWDHc"))))))
 
+(defn speaking-layout [talk]
+  (li
+   (p (strong (talk :title)))
+   (p (talk :location))))
+
+
 ;;;;;;;;;;;;;;;;;;;;
-;; Header         ;;
+;; Layout: Header ;;
 ;;;;;;;;;;;;;;;;;;;;
 
 (def resume-header
@@ -69,6 +98,27 @@
                       )))))
 
 ;;;;;;;;;;;;;;;;;;;;
+;; Layout: Awards ;;
+;;;;;;;;;;;;;;;;;;;;
+
+(defn award-layout [award]
+  (li
+   (if (= (award :highlight) "strong")
+     (p {:class "highlight"} (strong (award :title)))
+     (p (strong (award :title))))
+   (p (award :org) "(" (award :type) ")")))
+
+(def awards
+  (fn [exhib] (let [award-list (exhib :awards)
+               number-of-awards (count award-list)
+               half (math/ceil (/ number-of-awards 2))
+               html-awards ""]
+           (div {:class "row"}
+                (section-header "Awards")
+                (two-col-list (take half award-list) award-layout)
+                (two-col-list (drop half award-list) award-layout)))))
+
+;;;;;;;;;;;;;;;;;;;;
 ;; 3 Talents      ;;
 ;;;;;;;;;;;;;;;;;;;;
 
@@ -79,9 +129,9 @@
 
 (def talent
   (fn [] (div {:class "row"}
-              (talent-column "creative")
+              (talent-column "educator")
               (talent-column "programmer")
-              (talent-column "educator"))))
+              (talent-column "creative"))))
 
 (def bio-summary
   (fn []
@@ -99,17 +149,6 @@
   (fn [title technology description] (div {:style "padding-left: 2.5em;"}
                                       (h4 title (small "BUILT USING: " technology))
                                       (p description))))
-
-(defn desc-itemizer [matcher-object points]
-  "I iterate through a java.util.regex.Matcher.find() object and turn each returned string into an HTML list item."
-  (let [single-point (re-find matcher-object)]
-    (if (some? single-point)
-      (desc-itemizer matcher-object (str points (li {:class "qualification"} single-point)))
-      points)))
-
-(defn desc-layout [description]
-  "regex to find the semicolon"
-  (ul {:class "qualifications"} (desc-itemizer (re-matcher #"\w[^;]+" description) "")))
 
 (defn experience-layout [employer]
   (div {:class "col-xs-12 job"}
@@ -157,26 +196,40 @@
                 (column-layout (nu :org) (nu :title) (nu :concentrations))
                 (column-layout (uni :org) (uni :title) (uni :concentrations))))))
 
-;;;;;;;;;;;;;;;;;;;;
-;; Awards         ;;
-;;;;;;;;;;;;;;;;;;;;
 
-(defn award-layout [award]
-  (li
-   (if (= (award :highlight) "strong")
-     (p {:class "highlight"} (strong (award :title)))
-     (p (strong (award :title))))
-   (p (award :org) "(" (award :type) ")")))
-
-(def awards
-  (fn [exhib] (let [award-list (exhib :awards)
-               number-of-awards (count award-list)
-               half (math/ceil (/ number-of-awards 2))
-               html-awards ""]
+(def academy-horiz
+  (fn [exhib] (let [nu (project-finder "Northwestern University" (exhib :education) "org")
+               uni (project-finder "University of Northern Iowa" (exhib :education) "org")]
            (div {:class "row"}
-                (section-header "Awards")
-                (two-col-list (take half award-list) award-layout)
-                (two-col-list (drop half award-list) award-layout)))))
+                (section-header "Education")
+                (single-column (nu :org) (nu :concentrations) (nu :title) (nu :year))
+                (single-column (uni :org) (uni :concentrations) (uni :title)  (uni :year))))))
+
+(def talks
+  (fn [exhib talk]
+    (let [nu        (project-finder "Northwestern University" (exhib :education) "org")
+          uni       (project-finder "University of Northern Iowa" (exhib :education) "org")
+          ai        (project-finder "Illinois Institute of Art" (talk :talks) "subtitle")
+          ccc       (project-finder "Columbia College Chicago" (talk :talks) "subtitle")
+          iadt      (project-finder "International Academy of Design and Technology" (talk :talks) "subtitle")
+          clj-conj  (project-finder "Programming What Cannot Be Programmed" (talk :talks) "title")
+          pecha     (project-finder "Computers & Intimacy" (talk :talks) "title")
+          c-base    (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
+          vcfmw     (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")]
+
+      (div
+       (div {:class "row"}
+            (section-header "Teaching Experience" "experience-section-header")
+            (single-column (ai :subtitle) (ai :location) (ai :title) (ai :date) (ai :synopsis) (ai :desc))
+            (single-column (iadt :subtitle) (iadt :location) (iadt :title) (iadt :date) (iadt :synopsis) (iadt :desc))
+            (single-column (ccc :subtitle) (ccc :location) (ccc :title) (ccc :date) (ccc :synopsis)))
+       (div {:class "row"}
+            (div {:class "col-xs-12 job"}
+                (section-header "Related Public Speaking Experience")
+                (two-col-list [clj-conj pecha] speaking-layout)
+                (two-col-list [c-base vcfmw] speaking-layout)))
+       ))))
+
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Publications   ;;
@@ -198,6 +251,57 @@
                 (two-col-list second-2-pubs pub-layout)))))
 
 ;;;;;;;;;;;;;;;;;;;;
+;; Sub-Layouts    ;;
+;;;;;;;;;;;;;;;;;;;;
+
+;; Programming
+
+(defn programming-sub-layout [data-set]
+  (div
+   ;;(talent) ;; alternative header: 3 columns listing talents
+   (bio-summary) ;; summary header
+   (hr-)
+
+   (experience (data-set :projects) (data-set :employment))
+   (hr-)
+
+   (awards (data-set :exhibitions))
+   (hr-)
+
+   (publications (data-set :exhibitions))
+   (hr-)
+
+   ;; 3 columns of academic experience
+   (academy (data-set :exhibitions) (data-set :talks))
+
+   ))
+
+;; Teaching
+
+(defn teaching-sub-layout [data-set]
+  (div
+
+   (talent) ;; alternative header: 3 columns listing talents
+   ;; (bio-summary) ;; summary header
+   (hr-)
+
+   (talks (data-set :exhibitions) (data-set :talks))
+
+   (div {:class "page-breaker"})
+
+   (publications (data-set :exhibitions))
+   (hr-)
+
+   ;;(experience (data-set :projects) (data-set :employment))
+   ;;(hr-)
+
+   (awards (data-set :exhibitions))
+   (hr-)
+
+   (academy-horiz (data-set :exhibitions))
+   ))
+
+;;;;;;;;;;;;;;;;;;;;
 ;; Main Layout    ;;
 ;;;;;;;;;;;;;;;;;;;;
 
@@ -217,21 +321,8 @@
 
           ;; document body
           (div {:id "bd"}
-
-               ;;(talent) ;; alternative header: 3 columns listing talents
-               (bio-summary) ;; summary header
-               (hr-)
-
-               (experience (data-set :projects) (data-set :employment))
-               (hr-)
-
-               (awards (data-set :exhibitions))
-               (hr-)
-
-               (publications (data-set :exhibitions))
-               (hr-)
-
-               ;; 3 columns of academic experience
-               (academy (data-set :exhibitions) (data-set :talks))))
+               ;;(programming-sub-layout data-set)
+               (teaching-sub-layout data-set)
+               ))
 
      (resume-footer))))))
