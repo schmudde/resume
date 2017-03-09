@@ -10,8 +10,8 @@
 ;;;;;;;;;;;;;;;;;;;;
 
 (defn get-data []
-  (load-string (slurp "models.edn")))
-;;  (load-string (slurp "https://raw.githubusercontent.com/schmudde/schmud-de/master/src/schmud_de/models.clj")))
+  ;;(load-string (slurp "models.edn")))
+  (load-string (slurp "https://raw.githubusercontent.com/schmudde/schmud-de/master/src/schmud_de/models.clj")))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; General Layout ;;
