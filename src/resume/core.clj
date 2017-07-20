@@ -14,7 +14,7 @@
   (load-string (slurp "https://raw.githubusercontent.com/schmudde/schmud-de/master/src/schmud_de/models.clj")))
 
 ;;;;;;;;;;;;;;;;;;;;
-;; General Layout ;;
+;; Tools          ;;
 ;;;;;;;;;;;;;;;;;;;;
 
 (defn desc-itemizer [matcher-object points]
@@ -24,14 +24,18 @@
       (desc-itemizer matcher-object (str points (li {:class "qualification"} single-point)))
       points)))
 
-(defn desc-layout [description]
-  "I create a HTML list. I expect a string of data delimited by semicolons."
-  (ul {:class "qualifications"} (desc-itemizer (re-matcher #"\w[^;]+" description) "")))
-
 (defn project-finder [search-term db keyword-search]
   (if (= ((first db) (keyword keyword-search)) search-term)
     (first db)
     (project-finder search-term (rest db) keyword-search)))
+
+;;;;;;;;;;;;;;;;;;;;
+;; Layouts        ;;
+;;;;;;;;;;;;;;;;;;;;
+
+(defn desc-layout [description]
+  "I create a HTML list. I expect a string of data delimited by semicolons."
+  (ul {:class "qualifications"} (desc-itemizer (re-matcher #"\w[^;]+" description) "")))
 
 (defn column-layout [talent title description]
   "I take parameters and build a single entry"
@@ -40,18 +44,43 @@
        (h3 title)
        (p description)))
 
-(defn single-column
+(defn single-column-layout
   "I take parameters and build a single entry"
-  [title subtitle description date & [class-synopsis bullet-points]]
+  [title subtitle description date & [class-synopsis bullet-points technology etc]]
   (div {:class "col-xs-12 job"}
-       (h2 title)
-       (h3 description (small subtitle) (small {:class "pull-right"} date))
+       (h2 title (small {:class "pull-right"} date))
+       (h3 description (small subtitle) (small technology))
        (p class-synopsis)
-       (if (nil? bullet-points) nil (desc-layout bullet-points))))
+       (if (nil? bullet-points) nil (desc-layout bullet-points))
+       etc))
 
-(defn line-builder [institution]
-  (let [{:keys [subtitle location title date synopsis desc]} institution]
-    (single-column subtitle location title date synopsis desc)))
+(defn speaking-layout [talk]
+  (li
+   (p (strong (talk :title)))
+   (p (talk :location))))
+
+(defn minor-column-layout
+  [title technology desc]
+    (div
+      (h4 title (small technology))
+      (p desc)))
+
+;;;;;;;;;;;;;;;;;;;;
+;; Layouts        ;;
+;;;;;;;;;;;;;;;;;;;;
+
+(defn category-appender [category]
+  (if category
+    (str "TECHNOLOGIES: " category)
+    category))
+
+(defn minor-line-builder [institution]
+  (let [{:keys [title technology desc]} institution]
+    (minor-column-layout title (category-appender technology) desc)))
+
+(defn line-builder [institution & [etc]]
+  (let [{:keys [subtitle location title date synopsis desc technology]} institution]
+    (single-column-layout subtitle location title date synopsis desc (category-appender technology) etc)))
 
 (defn achievement-list-builder [achievements html-out template]
   (if (seq achievements)
@@ -76,12 +105,6 @@
                  (div {:class "container"}
                       (p "Made With Clojure &nbsp;|&nbsp; See the Source Code: "
                          (a {:href "http://bit.ly/2bWWDHc"} "http://bit.ly/2bWWDHc"))))))
-
-(defn speaking-layout [talk]
-  (li
-   (p (strong (talk :title)))
-   (p (talk :location))))
-
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Layout: Header ;;
@@ -145,45 +168,30 @@
          (div {:class "col-xs-12"}
               (p (bio/biography :summary))))))
 
-
 ;;;;;;;;;;;;;;;;;;;;
 ;; Experience     ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(def beyond-the-frame
-  (fn [title technology description] (div {:style "padding-left: 2.5em;"}
-                                      (h4 title (small "BUILT USING: " technology))
-                                      (p description))))
-
-(defn experience-layout [employer]
-  (div {:class "col-xs-12 job"}
-       (h2 (employer :employer) (small {:class "pull-right"} (employer :date)))
-       (h3 (employer :title) (small "TECHNOLOGIES: " (employer :technology)))
-       (desc-layout (employer :desc))))
-
 (def experience
-  (fn [proj employ] (let [jack-machine (project-finder "Jack and the Machine" (proj :projects) "title")
-               borderless   (project-finder "Borderless" (proj :projects) "title")
-               rhythm       (project-finder "The Rhythm of Time" (proj :projects) "title")
-               distant      (project-finder "Distant Apologies" (proj :projects) "title")
-               btf          (project-finder "Beyond the Frame" (employ :employers) "employer")
-               penguin      (project-finder "Penguin Random House" (employ :employers) "employer")
-               netgalley    (project-finder "NetGalley" (employ :employers) "employer")
-               ef-sharp     (project-finder "F#" (employ :employers) "employer")]
+  (fn [proj employ]
+    (let [jack-machine (project-finder "Jack and the Machine" (proj :projects) "title")
+          borderless   (project-finder "Borderless" (proj :projects) "title")
+          rhythm       (project-finder "The Rhythm of Time" (proj :projects) "title")
+          distant      (project-finder "Distant Apologies" (proj :projects) "title")
+          btf          (project-finder "Beyond the Frame" (employ :employers) "subtitle")
+          penguin      (project-finder "Penguin Random House" (employ :employers) "subtitle")
+          netgalley    (project-finder "NetGalley" (employ :employers) "subtitle")
+          ef-sharp     (project-finder "F#" (employ :employers) "subtitle")]
 
-           (div {:class "row"}
-                (section-header "Selected Experience" "experience-section-header")
-                (div {:class "col-xs-12 job"}
-                     (h2 (btf :employer) (small {:class "pull-right"} (btf :date)))
-                     (h3 (btf :title) (small "TECHNOLOGIES: " (btf :technology)))
-                     (desc-layout (btf :desc))
-                     (beyond-the-frame (jack-machine :title) (jack-machine :technology) (jack-machine :desc))
-                     (beyond-the-frame (borderless :title) (borderless :technology) (borderless :desc))
-                     (beyond-the-frame (rhythm :title) (rhythm :technology) (rhythm :desc))
-                     (beyond-the-frame (distant :title) (distant :technology) (distant :desc)))
-                (experience-layout penguin)
-                (experience-layout netgalley)
-                (experience-layout ef-sharp)))))
+      (div {:class "row"}
+           (section-header "Selected Experience" "experience-section-header")
+
+           (->> (clojure.core/map #(minor-line-builder %) [jack-machine rhythm distant])
+                (reduce str)
+                (div {:style "padding-left: 2.5em;"})
+                (line-builder btf))
+
+           (reduce str (clojure.core/map #(line-builder %) [penguin netgalley ef-sharp]))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Academic       ;;
@@ -192,23 +200,25 @@
 ;; Update database
 
 (def academy
-  (fn [exhib talk] (let [nu (project-finder "Northwestern University" (exhib :education) "org")
-               uni (project-finder "University of Northern Iowa" (exhib :education) "org")
+  (fn [exhib talk] (let [nu (project-finder "Northwestern University" (exhib :education) "subtitle")
+               uni (project-finder "University of Northern Iowa" (exhib :education) "subtitle")
                ai (project-finder "Illinois Institute of Art" (talk :talks) "subtitle")]
            (div {:class "row"}
                 (section-header "Selected Academic Experience")
                 (column-layout (ai :subtitle) (ai :title) (ai :location))
-                (column-layout (nu :org) (nu :title) (nu :concentrations))
-                (column-layout (uni :org) (uni :title) (uni :concentrations))))))
+                (column-layout (nu :subtitle) (nu :title) (nu :concentrations))
+                (column-layout (uni :subtitle) (uni :title) (uni :concentrations))))))
 
 
 (def academy-horiz
-  (fn [exhib] (let [nu (project-finder "Northwestern University" (exhib :education) "org")
-               uni (project-finder "University of Northern Iowa" (exhib :education) "org")]
+  (fn [exhib] (let [nu (project-finder "Northwestern University" (exhib :education) "subtitle")
+               uni (project-finder "University of Northern Iowa" (exhib :education) "subtitle")]
            (div {:class "row"}
                 (section-header "Education")
-                (single-column (nu :org) (nu :concentrations) (nu :title) (nu :year))
-                (single-column (uni :org) (uni :concentrations) (uni :title)  (uni :year))))))
+                (reduce str (clojure.core/map #(line-builder %) [nu uni]))
+                ;; (single-column-layout (nu :org) (nu :concentrations) (nu :title) (nu :year))
+                ;; (single-column-layout (uni :org) (uni :concentrations) (uni :title)  (uni :year))
+                ))))
 
 (def talks
   (fn [talk]
@@ -216,23 +226,25 @@
           ai        (project-finder "Illinois Institute of Art" (talk :talks) "subtitle")
           ccc       (project-finder "Columbia College Chicago" (talk :talks) "subtitle")
           iadt      (project-finder "International Academy of Design and Technology" (talk :talks) "subtitle")
+
           clj-conj  (project-finder "Aesthetics and Narrative" (talk :talks) "title")
-          nycdh     (project-finder "Strategies for Interactive and Immersive Dance" (talk :talks) "title")
-          pecha     (project-finder "Computers & Intimacy" (talk :talks) "title")
-          c-base    (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
           vcfmw     (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
-          modes     (project-finder "The Grammar of the Internet" (talk :talks) "title")]
+          i-take    (project-finder "I T.A.K.E Unconference (Keynote), Bucharest, Romania" (talk :talks) "location")
+          clj-brdg  (project-finder "Teacher: Advanced Track" (talk :talks) "title")
+          modes     (project-finder "The Grammar of the Internet" (talk :talks) "title")
+          nycdh     (project-finder "Strategies for Interactive and Immersive Dance" (talk :talks) "title")
+          c-base    (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
+          pecha     (project-finder "Computers & Intimacy" (talk :talks) "title")]
 
       (div
        (div {:class "row"}
             (section-header "Research and Teaching Experience" "experience-section-header")
             (reduce str (clojure.core/map #(line-builder %) [stevens ai iadt ccc])))
-
-       ;; (div {:class "row"}
-       ;;      (div {:class "col-xs-12 job"}
-       ;;          (section-header "Related Public Speaking Experience")
-       ;;          (two-col-list [clj-conj nycdh pecha] speaking-layout)
-       ;;          (two-col-list [c-base vcfmw modes] speaking-layout)))
+       (div {:class "row"}
+            (div {:class "col-xs-12 job"}
+                (section-header "Related Public Speaking Experience")
+                (two-col-list [clj-conj vcfmw i-take clj-brdg] speaking-layout)
+                (two-col-list [modes nycdh c-base pecha] speaking-layout)))
        ))))
 
 
