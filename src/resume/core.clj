@@ -49,6 +49,10 @@
        (p class-synopsis)
        (if (nil? bullet-points) nil (desc-layout bullet-points))))
 
+(defn line-builder [institution]
+  (let [{:keys [subtitle location title date synopsis desc]} institution]
+    (single-column subtitle location title date synopsis desc)))
+
 (defn achievement-list-builder [achievements html-out template]
   (if (seq achievements)
     (achievement-list-builder (rest achievements)
@@ -207,10 +211,8 @@
                 (single-column (uni :org) (uni :concentrations) (uni :title)  (uni :year))))))
 
 (def talks
-  (fn [exhib talk]
-    (let [nu        (project-finder "Northwestern University" (exhib :education) "org")
-          uni       (project-finder "University of Northern Iowa" (exhib :education) "org")
-          stevens   (project-finder "Stevens Institute of Technology" (talk :talks) "subtitle")
+  (fn [talk]
+    (let [stevens   (project-finder "Stevens Institute of Technology" (talk :talks) "subtitle")
           ai        (project-finder "Illinois Institute of Art" (talk :talks) "subtitle")
           ccc       (project-finder "Columbia College Chicago" (talk :talks) "subtitle")
           iadt      (project-finder "International Academy of Design and Technology" (talk :talks) "subtitle")
@@ -218,20 +220,19 @@
           nycdh     (project-finder "Strategies for Interactive and Immersive Dance" (talk :talks) "title")
           pecha     (project-finder "Computers & Intimacy" (talk :talks) "title")
           c-base    (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
-          vcfmw     (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")]
+          vcfmw     (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
+          modes     (project-finder "The Grammar of the Internet" (talk :talks) "title")]
 
       (div
        (div {:class "row"}
             (section-header "Research and Teaching Experience" "experience-section-header")
-            (single-column (stevens :subtitle) (stevens :location) (stevens :title) (stevens :date) (stevens :synopsis) (stevens :desc))
-            (single-column (ai :subtitle) (ai :location) (ai :title) (ai :date) (ai :synopsis) (ai :desc))
-            (single-column (iadt :subtitle) (iadt :location) (iadt :title) (iadt :date) (iadt :synopsis) (iadt :desc))
-            (single-column (ccc :subtitle) (ccc :location) (ccc :title) (ccc :date) (ccc :synopsis)))
-       (div {:class "row"}
-            (div {:class "col-xs-12 job"}
-                (section-header "Related Public Speaking Experience")
-                (two-col-list [clj-conj nycdh pecha] speaking-layout)
-                (two-col-list [c-base vcfmw] speaking-layout)))
+            (reduce str (clojure.core/map #(line-builder %) [stevens ai iadt ccc])))
+
+       ;; (div {:class "row"}
+       ;;      (div {:class "col-xs-12 job"}
+       ;;          (section-header "Related Public Speaking Experience")
+       ;;          (two-col-list [clj-conj nycdh pecha] speaking-layout)
+       ;;          (two-col-list [c-base vcfmw modes] speaking-layout)))
        ))))
 
 
@@ -269,8 +270,11 @@
    (experience (data-set :projects) (data-set :employment))
    (hr-)
 
-   (awards (data-set :exhibitions))
-   (hr-)
+   (talks (data-set :talks))
+   (hr- )
+
+   ;; (awards (data-set :exhibitions))
+   ;; (hr-)
 
    (publications (data-set :exhibitions))
    (hr-)
@@ -289,7 +293,7 @@
    ;; (bio-summary) ;; summary header
    (hr-)
 
-   (talks (data-set :exhibitions) (data-set :talks))
+   (talks (data-set :talks))
 
    (div {:class "page-breaker"})
 
@@ -325,8 +329,8 @@
 
           ;; document body
           (div {:id "bd"}
-               ;;(programming-sub-layout data-set)
-               (teaching-sub-layout data-set)
+               (programming-sub-layout data-set)
+               ;;(teaching-sub-layout data-set)
                ))
 
      (resume-footer))))))
