@@ -10,7 +10,6 @@
 ;;;;;;;;;;;;;;;;;;;;
 
 (defn get-data []
-  ;;(load-string (slurp "models.edn")))
   (load-string (slurp "https://raw.githubusercontent.com/schmudde/schmud-de/master/src/schmud_de/models.clj")))
 
 ;;;;;;;;;;;;;;;;;;;;
@@ -227,9 +226,9 @@
     (let [clj-conj  (project-finder "Aesthetics and Narrative" (talk :talks) "title")
           vcfmw     (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
           i-take    (project-finder "I T.A.K.E Unconference (Keynote), Bucharest, Romania" (talk :talks) "location")
-          clj-brdg  (project-finder "Teacher: Advanced Track" (talk :talks) "title")
+          clj-brdg  (project-finder "ClojureBridge New York City" (talk :talks) "location")
           modes     (project-finder "The Grammar of the Internet" (talk :talks) "title")
-          nycdh     (project-finder "Strategies for Interactive and Immersive Dance" (talk :talks) "title")
+          nycdh     (project-finder "New York City Digital Humanities Festival" (talk :talks) "location")
           c-base    (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
           pecha     (project-finder "Computers & Intimacy" (talk :talks) "title")]
 
@@ -288,6 +287,7 @@
    (publications (data-set :exhibitions))
    (hr-)
 
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; 3 columns of academic experience
    (academy (data-set :exhibitions) (data-set :talks))
 
@@ -301,10 +301,11 @@
    (talent) ;; alternative header: 3 columns listing talents
    (hr-)
 
-   (div (talks (data-set :talks))
-               (public-speaking (data-set :talks)))
+   (div (talks (data-set :talks)))
 
    (div {:class "page-breaker"})
+
+   (div (public-speaking (data-set :talks)))
 
    (publications (data-set :exhibitions))
    (hr-)
@@ -330,13 +331,16 @@
           (link {:rel "stylesheet" :href "css/styles.css"}))
     (body
      (div {:class "container" :id "inner"}
-          ;; header: name, title, phone number, etc...
+          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+          ;; Header: name, title, phone number, etc...
           (resume-header)
 
-          ;; document body
+          ;;;;;;;;;;;;;;;;;;
+          ;; Document Body
           (div {:id "bd"}
-               (programming-sub-layout data-set)
-               ;;(teaching-sub-layout data-set)
+               ;;(programming-sub-layout data-set)
+               (teaching-sub-layout data-set)
                ))
 
-     (resume-footer))))))
+     (resume-footer)
+     )))))
