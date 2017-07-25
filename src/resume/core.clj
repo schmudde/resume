@@ -119,10 +119,14 @@
             (div {:class "col-sm-6"}
                  (div {:class "contact-info"}
                       (table {:class "table"}
-                             (tr (td (span {:class "glyphicon glyphicon-envelope" :aria-hidden "true"}) "&nbsp" (bio/biography :email))
-                                 (td (span {:class "glyphicon glyphicon-globe" :aria-hidden "true"}) "&nbsp;" (bio/biography :website)))
-                             (tr (td (span {:class "glyphicon glyphicon-earphone" :aria-hidden "true"}) "&nbsp" (bio/biography :phone))
-                                 (td (span {:class "glyphicon glyphicon-home" :aria-hidden "true"}) "&nbsp;" (bio/biography :city))))
+                             (tr (td ;; (span {:class "glyphicon glyphicon-envelope" :aria-hidden "true"})
+                                     "&nbsp" (bio/biography :email))
+                                 (td ;; (span {:class "glyphicon glyphicon-globe" :aria-hidden "true"})
+                                     "&nbsp;" (bio/biography :website)))
+                             (tr (td ;; (span {:class "glyphicon glyphicon-earphone" :aria-hidden "true"})
+                                     "&nbsp" (bio/biography :phone))
+                                 (td ;; (span {:class "glyphicon glyphicon-home" :aria-hidden "true"})
+                                     "&nbsp;" (bio/biography :city))))
                       )))))
 
 ;;;;;;;;;;;;;;;;;;;;
@@ -201,11 +205,11 @@
 
 (def academy
   (fn [exhib talk] (let [nu (project-finder "Northwestern University" (exhib :education) "subtitle")
-               uni (project-finder "University of Northern Iowa" (exhib :education) "subtitle")
-               ai (project-finder "Illinois Institute of Art" (talk :talks) "subtitle")]
+                         uni (project-finder "University of Northern Iowa" (exhib :education) "subtitle")
+                         stevens   (project-finder "Stevens Institute of Technology" (talk :talks) "subtitle")]
            (div {:class "row"}
                 (section-header "Selected Academic Experience")
-                (column-layout (ai :subtitle) (ai :title) (ai :location))
+                (column-layout (stevens :subtitle) (stevens :title) (stevens :location))
                 (column-layout (nu :subtitle) (nu :title) (nu :concentrations))
                 (column-layout (uni :subtitle) (uni :title) (uni :concentrations))))))
 
@@ -216,18 +220,11 @@
            (div {:class "row"}
                 (section-header "Education")
                 (reduce str (clojure.core/map #(line-builder %) [nu uni]))
-                ;; (single-column-layout (nu :org) (nu :concentrations) (nu :title) (nu :year))
-                ;; (single-column-layout (uni :org) (uni :concentrations) (uni :title)  (uni :year))
                 ))))
 
-(def talks
+(def public-speaking
   (fn [talk]
-    (let [stevens   (project-finder "Stevens Institute of Technology" (talk :talks) "subtitle")
-          ai        (project-finder "Illinois Institute of Art" (talk :talks) "subtitle")
-          ccc       (project-finder "Columbia College Chicago" (talk :talks) "subtitle")
-          iadt      (project-finder "International Academy of Design and Technology" (talk :talks) "subtitle")
-
-          clj-conj  (project-finder "Aesthetics and Narrative" (talk :talks) "title")
+    (let [clj-conj  (project-finder "Aesthetics and Narrative" (talk :talks) "title")
           vcfmw     (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
           i-take    (project-finder "I T.A.K.E Unconference (Keynote), Bucharest, Romania" (talk :talks) "location")
           clj-brdg  (project-finder "Teacher: Advanced Track" (talk :talks) "title")
@@ -236,17 +233,22 @@
           c-base    (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
           pecha     (project-finder "Computers & Intimacy" (talk :talks) "title")]
 
-      (div
-       (div {:class "row"}
-            (section-header "Research and Teaching Experience" "experience-section-header")
-            (reduce str (clojure.core/map #(line-builder %) [stevens ai iadt ccc])))
-       (div {:class "row"}
-            (div {:class "col-xs-12 job"}
+      (div {:class "row"}
+           (div {:class "col-xs-12 job"}
                 (section-header "Related Public Speaking Experience")
                 (two-col-list [clj-conj vcfmw i-take clj-brdg] speaking-layout)
-                (two-col-list [modes nycdh c-base pecha] speaking-layout)))
-       ))))
+                (two-col-list [modes nycdh c-base pecha] speaking-layout))))))
 
+(def talks
+  (fn [talk]
+    (let [stevens   (project-finder "Stevens Institute of Technology" (talk :talks) "subtitle")
+          ai        (project-finder "Illinois Institute of Art" (talk :talks) "subtitle")
+          ccc       (project-finder "Columbia College Chicago" (talk :talks) "subtitle")
+          iadt      (project-finder "International Academy of Design and Technology" (talk :talks) "subtitle")]
+
+       (div {:class "row"}
+            (section-header "Research and Teaching Experience" "experience-section-header")
+            (reduce str (clojure.core/map #(line-builder %) [stevens ai iadt ccc]))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Publications   ;;
@@ -275,18 +277,13 @@
 
 (defn programming-sub-layout [data-set]
   (div
-   ;;(talent) ;; alternative header: 3 columns listing talents
    (bio-summary) ;; summary header
    (hr-)
 
    (experience (data-set :projects) (data-set :employment))
-   (hr-)
 
-   (talks (data-set :talks))
+   (div (public-speaking (data-set :talks)))
    (hr- )
-
-   ;; (awards (data-set :exhibitions))
-   ;; (hr-)
 
    (publications (data-set :exhibitions))
    (hr-)
@@ -302,18 +299,15 @@
   (div
 
    (talent) ;; alternative header: 3 columns listing talents
-   ;; (bio-summary) ;; summary header
    (hr-)
 
-   (talks (data-set :talks))
+   (div (talks (data-set :talks))
+               (public-speaking (data-set :talks)))
 
    (div {:class "page-breaker"})
 
    (publications (data-set :exhibitions))
    (hr-)
-
-   ;;(experience (data-set :projects) (data-set :employment))
-   ;;(hr-)
 
    (awards (data-set :exhibitions))
    (hr-)
