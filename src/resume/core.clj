@@ -223,8 +223,9 @@
 
 (def public-speaking
   (fn [talk]
-    (let [clj-conj  (project-finder "Aesthetics and Narrative" (talk :talks) "title")
-          vcfmw     (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
+    (let [clj-conj  (project-finder "Clojure/conj, Austin, TX" (talk :talks) "location")
+          ;;vcfmw     (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
+          shot      (project-finder "Unlikely Harbingers" (talk :talks) "title")
           i-take    (project-finder "I T.A.K.E Unconference (Keynote), Bucharest, Romania" (talk :talks) "location")
           clj-brdg  (project-finder "ClojureBridge New York City" (talk :talks) "location")
           modes     (project-finder "The Grammar of the Internet" (talk :talks) "title")
@@ -235,7 +236,7 @@
       (div {:class "row"}
            (div {:class "col-xs-12 job"}
                 (section-header "Related Public Speaking Experience")
-                (two-col-list [clj-conj vcfmw i-take clj-brdg] speaking-layout)
+                (two-col-list [clj-conj shot i-take clj-brdg] speaking-layout)
                 (two-col-list [modes nycdh c-base pecha] speaking-layout))))))
 
 (def talks
@@ -303,7 +304,7 @@
 
    (div (talks (data-set :talks)))
 
-   (div {:class "page-breaker"})
+   ;;(div {:class "page-breaker"})
 
    (div (public-speaking (data-set :talks)))
 
