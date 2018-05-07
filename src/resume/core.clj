@@ -101,9 +101,9 @@
 
 (def resume-footer
   (fn [] (footer {:class "footer"}
-                 (div {:class "container"}
-                      (p "Made With Clojure &nbsp;|&nbsp; See the Source Code: "
-                         (a {:href "http://bit.ly/2bWWDHc"} "http://bit.ly/2bWWDHc"))))))
+                (div {:class "container"}
+                     (p "Made With Clojure &nbsp;|&nbsp; See the Source Code: "
+                        (a {:href "http://bit.ly/2bWWDHc"} "http://bit.ly/2bWWDHc"))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Layout: Header ;;
@@ -118,15 +118,14 @@
             (div {:class "col-sm-6"}
                  (div {:class "contact-info"}
                       (table {:class "table"}
-                             (tr (td ;; (span {:class "glyphicon glyphicon-envelope" :aria-hidden "true"})
+                             (tr (td (span {:class "fa fa-envelope-o" :aria-hidden "true"})
                                      "&nbsp" (bio/biography :email))
-                                 (td ;; (span {:class "glyphicon glyphicon-globe" :aria-hidden "true"})
+                                 (td (span {:class "fa fa-globe" :aria-hidden "true"})
                                      "&nbsp;" (bio/biography :website)))
-                             (tr (td ;; (span {:class "glyphicon glyphicon-earphone" :aria-hidden "true"})
+                             (tr (td (span {:class "fa fa-phone" :aria-hidden "true"})
                                      "&nbsp" (bio/biography :phone))
-                                 (td ;; (span {:class "glyphicon glyphicon-home" :aria-hidden "true"})
-                                     "&nbsp;" (bio/biography :city))))
-                      )))))
+                                 (td (span {:class "fa fa-home" :aria-hidden "true"})
+                                     "&nbsp;" (bio/biography :city)))))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Layout: Awards ;;
@@ -182,6 +181,7 @@
           rhythm       (project-finder "The Rhythm of Time" (proj :projects) "title")
           distant      (project-finder "Distant Apologies" (proj :projects) "title")
           btf          (project-finder "Beyond the Frame" (employ :employers) "subtitle")
+          nextjournal  (project-finder "Nextjournal" (employ :employers) "subtitle")
           penguin      (project-finder "Penguin Random House" (employ :employers) "subtitle")
           netgalley    (project-finder "NetGalley" (employ :employers) "subtitle")
           ef-sharp     (project-finder "F#" (employ :employers) "subtitle")]
@@ -194,7 +194,7 @@
                 (div {:style "padding-left: 2.5em;"})
                 (line-builder btf))
 
-           (reduce str (clojure.core/map #(line-builder %) [penguin netgalley ef-sharp]))))))
+           (reduce str (clojure.core/map #(line-builder %) [nextjournal penguin netgalley ef-sharp]))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Academic       ;;
@@ -281,6 +281,7 @@
    (hr-)
 
    (experience (data-set :projects) (data-set :employment))
+   (hr- )
 
    (div (public-speaking (data-set :talks)))
    (hr- )
@@ -314,8 +315,7 @@
    (awards (data-set :exhibitions))
    (hr-)
 
-   (academy-horiz (data-set :exhibitions))
-   ))
+   (academy-horiz (data-set :exhibitions))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Main Layout    ;;
@@ -329,7 +329,10 @@
    (html
     (head (title {:style "font-family:'Courier';"} "D. Schm&uuml;dde: Resume")
           (link {:rel "stylesheet" :type "text/css" :href "css/bootstrap.min.css" :media "all"})
-          (link {:rel "stylesheet" :href "css/styles.css"}))
+          (link {:rel "stylesheet" :href "css/styles.css"})
+          (link {:rel "stylesheet" :href "https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"
+                 :integrity "sha256-3dkvEK0WLHRJ7/Csr0BZjAWxERc5WH7bdeUya2aXxdU= sha512-+L4yy6FRcDGbXJ9mPG8MT/3UCDzwR9gPeyFNMCtInsol++5m3bk2bXWKdZjvybmohrAsn3Ua5x8gfLnbE1YkOg=="
+                 :crossorigin "anonymous"}))
     (body
      (div {:class "container" :id "inner"}
           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -339,9 +342,7 @@
           ;;;;;;;;;;;;;;;;;;
           ;; Document Body
           (div {:id "bd"}
-               ;;(programming-sub-layout data-set)
-               (teaching-sub-layout data-set)
-               ))
+               (programming-sub-layout data-set)
+               #_(teaching-sub-layout data-set)))
 
-     (resume-footer)
-     )))))
+     (resume-footer))))))

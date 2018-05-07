@@ -9,7 +9,26 @@ This resume dynamically pulls the newest information from my website and updates
 - [Prince](https://www.princexml.com/)
     - Requires [libpng12](https://packages.ubuntu.com/xenial/libpng12-0)
     - libpng12 for 16.04 shouldn't conflict with libpng16 for 17.10
+- [Font Awesome 4.5](https://fontawesome.com/v4.7.0/)
 - `font-family: 'Avenir Next', 'Helvetica Neue', Arial, sans-serif;`
+
+## CSS
+
+```
+resources/compile-css.sh
+  |- css
+    |- /bootstrap-3.3.7
+      |- /less
+        |- /bootstrap.less
+        |- /print.less
+        |- /variables.less
+        |- /...
+  |- print.less
+  |- variables.less
+  |- styles.css (included)
+```
+
+Symlinks to `print.less` and `variables.less` must be made manually!
 
 ## Usage
 
