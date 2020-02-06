@@ -1,14 +1,14 @@
 (ns resume.bio)
 
 (def biography
-  {:title "D. Schm&uuml;dde: Resume"
-   :name "D. Schm&uuml;dde"
+  {:title "David Schmudde: Resume"
+   :name "David Schmudde"
    :job-title "Creative Technologist"
    :email "d@schmud.de"
    :website "http://schmud.de"
-   :phone "312.451.5952"
-   :city "Brooklyn, NY"
-   :summary "Creates groundbreaking experiences with others who think beyond the limitations of platforms and see the synergy between mobile, television, interactive, and site-specific work. An accomplished producer and director with a strong social media presence, a technical grounding in many computer languages and video formats, and a creative mind with strong aesthetic principles."})
+   :phone "917.994.1620"
+   :city "Turin, Italy"
+   :summary "My career in informatics spans engineering, education, and art. I have helped others communicate difficult concepts, plan complex systems, and craft innovative products. I am an advocate of Linux, Lisp/Clojure, and Jupyter/Python notebooks. Areas of research include the structure and transmission of information, the social impact of technology, digital art, and applied computation."})
 
 (def talent
   {:creative {:title "Creative"

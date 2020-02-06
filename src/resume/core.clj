@@ -144,7 +144,7 @@
                half (math/ceil (/ number-of-awards 2))
                html-awards ""]
            (div {:class "row"}
-                (section-header "Awards")
+                (section-header "Selected Awards")
                 (two-col-list (take half award-list) award-layout)
                 (two-col-list (drop half award-list) award-layout)))))
 
@@ -189,12 +189,14 @@
       (div {:class "row"}
            (section-header "Selected Experience" "experience-section-header")
 
+           (reduce str (clojure.core/map #(line-builder %) [nextjournal]))
+
            (->> (clojure.core/map #(minor-line-builder %) [jack-machine rhythm distant])
                 (reduce str)
                 (div {:style "padding-left: 2.5em;"})
                 (line-builder btf))
 
-           (reduce str (clojure.core/map #(line-builder %) [nextjournal penguin netgalley ef-sharp]))))))
+           (reduce str (clojure.core/map #(line-builder %) [penguin netgalley ef-sharp]))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Academic       ;;
@@ -203,15 +205,23 @@
 ;; Update database
 
 (def academy
-  (fn [exhib talk] (let [nu (project-finder "Northwestern University" (exhib :education) "subtitle")
-                         uni (project-finder "University of Northern Iowa" (exhib :education) "subtitle")
-                         stevens   (project-finder "Stevens Institute of Technology" (talk :talks) "subtitle")]
+  (fn [exhib talk] (let [nu   (project-finder "Northwestern University" (exhib :education) "subtitle")
+                         uni  (project-finder "University of Northern Iowa" (exhib :education) "subtitle")
+                         stevens (project-finder "Stevens Institute of Technology" (talk :talks) "subtitle")
+                         ia   (project-finder "Illinois Institute of Art" (talk :talks) "subtitle")
+                         ccc  (project-finder "Columbia College Chicago" (talk :talks) "subtitle")
+                         iadt (project-finder "International Academy of Design and Technology" (talk :talks) "subtitle")]
            (div {:class "row"}
                 (section-header "Selected Academic Experience")
-                (column-layout (stevens :subtitle) (stevens :title) (stevens :location))
-                (column-layout (nu :subtitle) (nu :title) (nu :concentrations))
-                (column-layout (uni :subtitle) (uni :title) (uni :concentrations))))))
-
+                (div {:class "row"}
+                     (column-layout (stevens :subtitle) (stevens :title) (stevens :location))
+                     (column-layout (ia :subtitle) (ia :title) (ia :location))
+                     (column-layout (iadt :subtitle) (iadt :title) (iadt :location)))
+                (div {:class "row"}
+                     (column-layout (ccc :subtitle) (ccc :title) (ccc :location))
+                     (column-layout (nu :subtitle) (nu :title) (nu :concentrations))
+                     (column-layout (uni :subtitle) (uni :title) (uni :concentrations)))
+))))
 
 (def academy-horiz
   (fn [exhib] (let [nu (project-finder "Northwestern University" (exhib :education) "subtitle")
@@ -223,21 +233,30 @@
 
 (def public-speaking
   (fn [talk]
-    (let [clj-conj  (project-finder "Clojure/conj, Austin, TX" (talk :talks) "location")
-          ;;vcfmw     (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
-          shot      (project-finder "Unlikely Harbingers" (talk :talks) "title")
-          i-take    (project-finder "I T.A.K.E Unconference (Keynote), Bucharest, Romania" (talk :talks) "location")
-          clj-brdg  (project-finder "ClojureBridge New York City" (talk :talks) "location")
-          modes     (project-finder "The Grammar of the Internet" (talk :talks) "title")
-          nycdh     (project-finder "New York City Digital Humanities Festival" (talk :talks) "location")
-          c-base    (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
-          pecha     (project-finder "Computers & Intimacy" (talk :talks) "title")]
+    (let [curry-on (project-finder "Curry On, London, England" (talk :talks) "location")
+          pycon    (project-finder "PyCon/PyData, Berlin, Germany" (talk :talks) "location")
+          computation   (project-finder "Society for the History of Technology, Milan, Italy" (talk :talks) "location")
+          internet      (project-finder "New York City" (talk :talks) "location")
+          strangeloop   (project-finder "Strange Loop, St. Louis, MO" (talk :talks) "location")
+          creative-code (project-finder "Creative Coding NYC" (talk :talks) "location")
+          anthropology (project-finder "Enabling Digital Anthropology" (talk :talks) "title")
+          intended    (project-finder "Intended Knowledge?" (talk :talks) "title")
+          sigcis      (project-finder "Stored In Memory: The 10th Annual SIGCIS Conference, St. Louis, MO" (talk :talks) "location")
+          clj-conj    (project-finder "Clojure/conj, Austin, TX" (talk :talks) "location")
+          vcfmw       (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
+          unlikely    (project-finder "Unlikely Harbingers" (talk :talks) "title")
+          i-take      (project-finder "I T.A.K.E Unconference (Keynote), Bucharest, Romania" (talk :talks) "location")
+          clj-brdg    (project-finder "ClojureBridge New York City" (talk :talks) "location")
+          modes       (project-finder "The Grammar of the Internet" (talk :talks) "title")
+          nycdh       (project-finder "New York City Digital Humanities Festival" (talk :talks) "location")
+          c-base      (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
+          pecha       (project-finder "Computers & Intimacy" (talk :talks) "title")]
 
       (div {:class "row"}
            (div {:class "col-xs-12 job"}
-                (section-header "Related Public Speaking Experience")
-                (two-col-list [clj-conj shot i-take clj-brdg] speaking-layout)
-                (two-col-list [modes nycdh c-base pecha] speaking-layout))))))
+                (section-header "Selected Public Speaking Experience")
+                (two-col-list [curry-on pycon strangeloop anthropology clj-conj i-take clj-brdg] speaking-layout)
+                (two-col-list [computation internet modes creative-code sigcis nycdh c-base] speaking-layout))))))
 
 (def talks
   (fn [talk]
@@ -273,9 +292,7 @@
 ;; Sub-Layouts    ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-;; Programming
-
-(defn programming-sub-layout [data-set]
+(defn cv-sub-layout [data-set]
   (div
    (bio-summary) ;; summary header
    (hr-)
@@ -288,6 +305,29 @@
 
    (publications (data-set :exhibitions))
    (hr-)
+
+   ;; (div {:class "page-breaker"})
+   (awards (data-set :exhibitions))
+   (hr-)
+
+   (div (talks (data-set :talks)))
+
+   ))
+
+;; Programming
+
+(defn programming-sub-layout [data-set]
+  (div
+   (bio-summary) ;; summary header
+
+   (experience (data-set :projects) (data-set :employment))
+   (small "&nbsp;")
+
+   (div (public-speaking (data-set :talks)))
+   (small "&nbsp;")
+
+   (publications (data-set :exhibitions))
+   (small "&nbsp;")
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ;; 3 columns of academic experience
@@ -342,6 +382,7 @@
           ;;;;;;;;;;;;;;;;;;
           ;; Document Body
           (div {:id "bd"}
+               #_(cv-sub-layout data-set)
                (programming-sub-layout data-set)
                #_(teaching-sub-layout data-set)))
 
