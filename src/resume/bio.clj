@@ -3,7 +3,7 @@
 (def biography
   {:title "David Schmudde: Resume"
    :name "David Schmudde"
-   :job-title "Creative Technologist"
+   :job-title "Developer Advocate" ; "Creative Technologist"
    :email "d@schmud.de"
    :website "http://schmud.de"
    :phone "917.994.1620"
