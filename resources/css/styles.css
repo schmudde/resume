@@ -3,7 +3,7 @@
 /* @base-bg: #fdf6b6; /\* yellow *\/ */
 /* @dark-compliment: #2700B2; /\* dark blue *\/ */
 /* @lite-complement: #6B29FF; /\* light blue *\/ */
-/* @contrasting-red: #946370; /\* dark red *\/ */
+/* @contrasting-red: #843853; /\* dark red *\/ */
 /* Colors: http://adobe.ly/2amTsZQ */
 
 body {
@@ -37,9 +37,9 @@ h4 > small { font-size: 10.25px; }
 
 h1 { color: #2700B2 !important; }
 h2 { color: #6B29FF !important; }
-h2 small, h3 small, h4 small, .contact-info, table { color: #946370 !important; }
+h2 small, h3 small, h4 small, .contact-info, table { color: #843853 !important; }
 
-p.section-header { color: #946370 !important; font-size: 11px; }
+p.section-header { color: #843853 !important; font-size: 11px; }
 
 table { font-size: 12px; }
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
@@ -77,6 +77,19 @@ footer > .container { border-top: solid #673BFF 2px; padding: 10px; }
     font-size: 75%;
 }
 
+.two-col-list li {
+    padding-bottom: 4px;
+}
+
+.two-col-list li div {
+    padding: 1 0 1 0;
+}
+
+.two-col-list .date {
+        color: #843853;
+        font-size: .86em;
+    }
+
 @media print {
     body {
         background: #fdf6b6 !important;
@@ -94,7 +107,7 @@ footer > .container { border-top: solid #673BFF 2px; padding: 10px; }
     .table th,
     span.glyphicon {
       background-color: #fdf6b6 !important;
-      color: #946370 !important;
+      color: #843853 !important;
      }
 
     a,

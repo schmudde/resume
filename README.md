@@ -14,6 +14,8 @@ This resume dynamically pulls the newest information from my website and updates
 
 ## CSS
 
+Most local changes are made to `styles.css`. Compile Less files by running `compile-css.sh`.
+
 ```
 resources/compile-css.sh
   |- css
@@ -36,6 +38,6 @@ This generates a HTML resume. `lein run > test.html` creates the file. Use Princ
 
 ## License
 
-Copyright © 2016 D. Schm&uuml;dde
+Copyright © 2020 D. Schm&uuml;dde
 
 Distributed under the Eclipse Public License

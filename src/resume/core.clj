@@ -29,10 +29,41 @@
     (project-finder search-term (rest db) keyword-search)))
 
 ;;;;;;;;;;;;;;;;;;;;
+;; Static Layouts ;;
+;;;;;;;;;;;;;;;;;;;;
+
+(defn resume-header []
+  (header {:class "row"}
+          (div {:class "col-sm-6"}
+               (h1 (bio/biography :name))
+               (h2 (bio/biography :job-title)))
+          (div {:class "col-sm-6"}
+               (div {:class "contact-info"}
+                    (table {:class "table"}
+                           (tr (td (span {:class "fa fa-envelope-o" :aria-hidden "true"})
+                                   "&nbsp" (bio/biography :email))
+                               (td (span {:class "fa fa-globe" :aria-hidden "true"})
+                                   "&nbsp;" (bio/biography :website)))
+                           (tr (td (span {:class "fa fa-phone" :aria-hidden "true"})
+                                   "&nbsp" (bio/biography :phone))
+                               (td (span {:class "fa fa-home" :aria-hidden "true"})
+                                   "&nbsp;" (bio/biography :city))))))))
+
+(defn resume-footer []
+  (footer {:class "footer"}
+          (div {:class "container"}
+               (p "Made With Clojure &nbsp;|&nbsp; See the Source Code: "
+                  (a {:href "http://bit.ly/2bWWDHc"} "http://bit.ly/2bWWDHc")))))
+
+;;;;;;;;;;;;;;;;;;;;
 ;; Layouts        ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(defn desc-layout [description]
+(defn section-header [header-name & additional-class]
+  (div {:class "col-xs-12"}
+       (h4 {:class (str "text-center section-header " (first additional-class))} header-name)))
+
+(defn make-list [description]
   "I create a HTML list. I expect a string of data delimited by semicolons."
   (ul {:class "qualifications"} (desc-itemizer (re-matcher #"[^~]+" description) "")))
 
@@ -50,92 +81,60 @@
        (h3 title)
        (p technology)))
 
-(defn single-column-layout
-  "I take parameters and build a single entry"
-  [title subtitle description date & [job-or-class-synopsis bullet-points technology etc]]
-  (div {:class "col-xs-12 job"}
-       (h2 title (small {:class "pull-right"} date))
-       (h3 description (small subtitle) (small technology))
-       (p job-or-class-synopsis)
-       (if (nil? bullet-points) nil (desc-layout bullet-points))
-       etc))
-
-(defn speaking-publication-layout [{:keys [title date location publication]}]
-  (li
-   (p (strong title) (small date))
-   (p (or location publication))))
-
-(defn minor-column-layout
-  [title technology desc]
-    (div
-      (h4 title (small technology))
-      (p desc)))
-
-
-
-
-(defn category-appender [category]
+(defn append-category [category]
   (if category
     (str "TECHNOLOGIES: " category)
     category))
 
-(defn minor-line-builder [institution]
-  (let [{:keys [title technology desc]} institution]
-    (minor-column-layout title (category-appender technology) desc)))
+(defn single-column-layout
+  "I take parameters and build a single entry"
+  [{:keys [title date desc subtitle technology synopsis]}]
+  (div {:class "col-xs-12"}
+       (h2 title (small {:class "pull-right"} date))
+       (h3 subtitle (small (append-category technology)))
+       (p desc)
+       (if (nil? synopsis) nil (make-list synopsis))))
 
-
-
-
-;; TODO: Change syopsis/accomplishments to details
-(defn line-builder [company-or-institution & [etc]]
-  (let [{:keys [title location subtitle date synopsis desc technology]} company-or-institution]
-    (single-column-layout title location subtitle date desc synopsis (category-appender technology) etc)))
-
-(defn achievement-list-builder [achievements html-out template]
+(defn list-achievements [achievements html-out template]
   (if (seq achievements)
-    (achievement-list-builder (rest achievements)
-                              (str html-out (template (first achievements)))
-                              template)
+    (list-achievements (rest achievements)
+                       (str html-out (template (first achievements)))
+                       template)
     html-out))
 
-(defn two-col-list
-  "I take a list and build out an entire column"
-  [list-column template]
+(defn two-col-list-layout
+  "I take a list and a layout and build out an entire column"
+  [template list-column]
   (div {:class "two-col-list"}
        (ul {:class "list-unstyled"}
-        (achievement-list-builder list-column  "" template))))
+           (list-achievements list-column  "" template))))
 
-(defn section-header [header-name & additional-class]
-  (div {:class "col-xs-12"}
-       (h4 {:class (str "text-center section-header " (first additional-class))} header-name)))
-
-(def resume-footer
-  (fn [] (footer {:class "footer"}
-                (div {:class "container"}
-                     (p "Made With Clojure &nbsp;|&nbsp; See the Source Code: "
-                        (a {:href "http://bit.ly/2bWWDHc"} "http://bit.ly/2bWWDHc"))))))
+(defn speaking-publication-layout [{:keys [title date location publication]}]
+  (li
+   (div (strong title))
+   (div (or location publication))
+   (div (small {:class "date"} date))))
 
 ;;;;;;;;;;;;;;;;;;;;
-;; Layout: Header ;;
+;; Talent Header  ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(def resume-header
-  (fn []
-    (header {:class "row"}
-            (div {:class "col-sm-6"}
-                 (h1 (bio/biography :name))
-                 (h2 (bio/biography :job-title)))
-            (div {:class "col-sm-6"}
-                 (div {:class "contact-info"}
-                      (table {:class "table"}
-                             (tr (td (span {:class "fa fa-envelope-o" :aria-hidden "true"})
-                                     "&nbsp" (bio/biography :email))
-                                 (td (span {:class "fa fa-globe" :aria-hidden "true"})
-                                     "&nbsp;" (bio/biography :website)))
-                             (tr (td (span {:class "fa fa-phone" :aria-hidden "true"})
-                                     "&nbsp" (bio/biography :phone))
-                                 (td (span {:class "fa fa-home" :aria-hidden "true"})
-                                     "&nbsp;" (bio/biography :city)))))))))
+(defn talent-column [talent]
+  (three-column-layout ((bio/talent (keyword talent)) :title)
+                       ((bio/talent (keyword talent)) :domain)
+                       ((bio/talent (keyword talent)) :desc)))
+
+(defn talent-layout []
+  (div {:class "row"}
+       (talent-column "educator")
+       (talent-column "programmer")
+       (talent-column "creative")))
+
+(defn summary-layout []
+  (div {:class "row"}
+       (section-header "Summary")
+       (div {:class "col-xs-12"}
+            (p (bio/biography :summary)))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Layout: Awards ;;
@@ -155,30 +154,8 @@
                html-awards ""]
            (div {:class "row"}
                 (section-header "Selected Awards")
-                (two-col-list (take half award-list) award-layout)
-                (two-col-list (drop half award-list) award-layout)))))
-
-;;;;;;;;;;;;;;;;;;;;
-;; 3 Talents      ;;
-;;;;;;;;;;;;;;;;;;;;
-
-(def talent-column (fn [talent]
-                     (three-column-layout ((bio/talent (keyword talent)) :title)
-                                    ((bio/talent (keyword talent)) :domain)
-                                    ((bio/talent (keyword talent)) :desc))))
-
-(def talent
-  (fn [] (div {:class "row"}
-              (talent-column "educator")
-              (talent-column "programmer")
-              (talent-column "creative"))))
-
-(def bio-summary
-  (fn []
-    (div {:class "row"}
-         (section-header "Summary")
-         (div {:class "col-xs-12"}
-              (p (bio/biography :summary))))))
+                (two-col-list-layout award-layout (take half award-list))
+                (two-col-list-layout award-layout (drop half award-list))))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Experience     ;;
@@ -193,7 +170,7 @@
 
     (div {:class "row"}
          (section-header "Selected Experience" "experience-section-header")
-         (reduce str (clojure.core/map #(line-builder %) [nextjournal btf penguin netgalley ef-sharp])))))
+         (reduce str (clojure.core/map #(single-column-layout %) [nextjournal btf penguin netgalley ef-sharp])))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Academic       ;;
@@ -201,24 +178,24 @@
 
 ;; Update database
 
-(def academy
-  (fn [exhib talk] (let [nu   (project-finder "Northwestern University" (exhib :education) "subtitle")
-                         uni  (project-finder "University of Northern Iowa" (exhib :education) "subtitle")
-                         stevens (project-finder "Stevens Institute of Technology" (talk :talks) "title")
-                         ia   (project-finder "Illinois Institute of Art" (talk :talks) "title")
-                         ccc  (project-finder "Columbia College Chicago" (talk :talks) "title")
-                         iadt (project-finder "International Academy of Design and Technology" (talk :talks) "title")]
-           (div {:class "row"}
-                (section-header "Selected Academic Experience")
-                (div {:class "row"}
-                     (three-column-layout (stevens :subtitle) (stevens :title) (stevens :location))
-                     (three-column-layout (ia :subtitle) (ia :title) (ia :location))
-                     (three-column-layout (iadt :subtitle) (iadt :title) (iadt :location)))
-                (div {:class "row"}
-                     (three-column-layout (ccc :subtitle) (ccc :title) (ccc :location))
-                     (three-column-layout (nu :subtitle) (nu :title) (nu :concentrations))
-                     (three-column-layout (uni :subtitle) (uni :title) (uni :concentrations)))
-))))
+(defn academy [exhib talk]
+  (let [nu   (project-finder "Northwestern University" (exhib :education) "subtitle")
+        uni  (project-finder "University of Northern Iowa" (exhib :education) "subtitle")
+        stevens (project-finder "Stevens Institute of Technology" (talk :talks) "title")
+        ia   (project-finder "Illinois Institute of Art" (talk :talks) "title")
+        ccc  (project-finder "Columbia College Chicago" (talk :talks) "title")
+        iadt (project-finder "International Academy of Design and Technology" (talk :talks) "title")]
+    (div {:class "row"}
+         (section-header "Selected Academic Experience")
+         (div {:class "row"}
+              (three-column-layout (stevens :subtitle) (stevens :title) (stevens :location))
+              (three-column-layout (ia :subtitle) (ia :title) (ia :location))
+              (three-column-layout (iadt :subtitle) (iadt :title) (iadt :location)))
+         (div {:class "row"}
+              (three-column-layout (ccc :subtitle) (ccc :title) (ccc :location))
+              (three-column-layout (nu :subtitle) (nu :title) (nu :concentrations))
+              (three-column-layout (uni :subtitle) (uni :title) (uni :concentrations)))
+)))
 
 (defn academy-horiz [exhib]
   (let [nu (project-finder "Northwestern University" (exhib :education) "subtitle")
@@ -228,32 +205,30 @@
          (two-column-layout (nu :subtitle) (nu :title) (nu :technology))
          (two-column-layout (uni :subtitle) (uni :title) (uni :technology)))))
 
-(def public-speaking
-  (fn [talk]
-    (let [curry-on (project-finder "Curry On, London, England" (talk :talks) "location")
-          pycon    (project-finder "PyCon/PyData, Berlin, Germany" (talk :talks) "location")
-          computation   (project-finder "Society for the History of Technology, Milan, Italy" (talk :talks) "location")
-          internet      (project-finder "New York City" (talk :talks) "location")
-          strangeloop   (project-finder "Strange Loop, St. Louis, MO" (talk :talks) "location")
-          creative-code (project-finder "Creative Coding NYC" (talk :talks) "location")
-          anthropology (project-finder "Enabling Digital Anthropology" (talk :talks) "title")
-          intended    (project-finder "Intended Knowledge?" (talk :talks) "title")
-          sigcis      (project-finder "Stored In Memory: The 10th Annual SIGCIS Conference, St. Louis, MO" (talk :talks) "location")
-          clj-conj    (project-finder "Clojure/conj, Austin, TX" (talk :talks) "location")
-          vcfmw       (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
-          unlikely    (project-finder "Unlikely Harbingers" (talk :talks) "title")
-          i-take      (project-finder "I T.A.K.E Unconference (Keynote), Bucharest, Romania" (talk :talks) "location")
-          clj-brdg    (project-finder "ClojureBridge New York City" (talk :talks) "location")
-          modes       (project-finder "The Grammar of the Internet" (talk :talks) "title")
-          nycdh       (project-finder "New York City Digital Humanities Festival" (talk :talks) "location")
-          c-base      (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
-          pecha       (project-finder "Computers & Intimacy" (talk :talks) "title")]
+(defn public-speaking [talk]
+  (let [curry-on (project-finder "Curry On, London, England" (talk :talks) "location")
+        pycon    (project-finder "PyCon/PyData, Berlin, Germany" (talk :talks) "location")
+        computation   (project-finder "Society for the History of Technology, Milan, Italy" (talk :talks) "location")
+        internet      (project-finder "New York City" (talk :talks) "location")
+        strangeloop   (project-finder "Strange Loop, St. Louis, MO" (talk :talks) "location")
+        creative-code (project-finder "Creative Coding NYC" (talk :talks) "location")
+        anthropology (project-finder "Enabling Digital Anthropology" (talk :talks) "title")
+        intended    (project-finder "Intended Knowledge?" (talk :talks) "title")
+        sigcis      (project-finder "Stored In Memory: The 10th Annual SIGCIS Conference, St. Louis, MO" (talk :talks) "location")
+        clj-conj    (project-finder "Clojure/conj, Austin, TX" (talk :talks) "location")
+        vcfmw       (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
+        unlikely    (project-finder "Unlikely Harbingers" (talk :talks) "title")
+        i-take      (project-finder "I T.A.K.E Unconference (Keynote), Bucharest, Romania" (talk :talks) "location")
+        clj-brdg    (project-finder "ClojureBridge New York City" (talk :talks) "location")
+        modes       (project-finder "The Grammar of the Internet" (talk :talks) "title")
+        nycdh       (project-finder "New York City Digital Humanities Festival" (talk :talks) "location")
+        c-base      (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
+        pecha       (project-finder "Computers & Intimacy" (talk :talks) "title")]
 
-      (div {:class "row"}
-           (div {:class "col-xs-12 job"}
-                (section-header "Selected Public Speaking Experience")
-                (two-col-list [curry-on pycon strangeloop anthropology clj-conj i-take clj-brdg] speaking-publication-layout)
-                (two-col-list [computation internet modes creative-code sigcis nycdh c-base] speaking-publication-layout))))))
+    (div {:class "row"}
+         (section-header "Selected Public Speaking Experience")
+         (two-col-list-layout speaking-publication-layout [curry-on pycon strangeloop anthropology clj-conj i-take clj-brdg])
+         (two-col-list-layout speaking-publication-layout [computation internet modes creative-code sigcis nycdh c-base]))))
 
 (defn teaching [talk]
   (let [stevens   (project-finder "Stevens Institute of Technology" (talk :talks) "title")
@@ -263,22 +238,29 @@
 
     (div {:class "row"}
          (section-header "Research and Teaching Experience" "experience-section-header")
-         (reduce str (clojure.core/map #(line-builder %) [stevens ai iadt ccc])))))
+         (reduce str (clojure.core/map #(single-column-layout %) [stevens ai iadt ccc])))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Publications   ;;
 ;;;;;;;;;;;;;;;;;;;;
 
+#_(defn publications [exhib]
+  (let [pub-list (exhib :publications)
+        html-pub ""
+        first-2-pubs (take 2 pub-list)
+        second-2-pubs (take 2 (drop 2 pub-list))]
+    (div {:class "row"}
+         (section-header "Selected Publications")
+         (two-col-list-layout speaking-publication-layout first-2-pubs)
+         (two-col-list-layout speaking-publication-layout second-2-pubs))))
 
-(def publications
-  (fn [exhib] (let [pub-list (exhib :publications)
-               html-pub ""
-               first-2-pubs (take 2 pub-list)
-               second-2-pubs (take 2 (drop 2 pub-list))]
-           (div {:class "row"}
-                (section-header "Selected Publications")
-                (two-col-list first-2-pubs speaking-publication-layout)
-                (two-col-list second-2-pubs speaking-publication-layout)))))
+(defn publications [{:keys [publications]}]
+  (let [num-of-publications (count publications)
+        one-column (partial two-col-list-layout speaking-publication-layout)]
+    (div {:class "row"}
+         (section-header "Selected Publications")
+         (one-column (take (/ num-of-publications 2) publications))
+         (one-column (drop (/ num-of-publications 2) publications)))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Sub-Layouts    ;;
@@ -286,7 +268,7 @@
 
 (defn cv-sub-layout [data-set]
   (div
-   (bio-summary) ;; summary header
+   (summary-layout) ;; summary header
    (hr-)
 
    (experience (data-set :projects) (data-set :employment))
@@ -302,7 +284,7 @@
    (awards (data-set :exhibitions))
    (hr-)
 
-   (div (teaching (data-set :talks)))
+   #_(div (teaching (data-set :talks)))
 
    ))
 
@@ -310,7 +292,7 @@
 
 (defn programming-sub-layout [data-set]
   (div
-   (bio-summary) ;; summary header
+   (summary-layout) ;; summary header
 
    (experience (data-set :projects) (data-set :employment))
    (small "&nbsp;")
@@ -340,10 +322,10 @@
 (defn teaching-sub-layout [data-set]
   (div
 
-   (talent) ;; alternative header: 3 columns listing talents
+   (talent-layout) ;; alternative header: 3 columns listing talents
    (hr-)
 
-   (div (teaching (data-set :talks)))
+   #_(div (teaching (data-set :talks)))
 
    ;;(div {:class "page-breaker"})
 
