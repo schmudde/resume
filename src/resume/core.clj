@@ -23,10 +23,20 @@
       (desc-itemizer matcher-object (str points (li {:class "qualification"} single-point)))
       points)))
 
-(defn project-finder [search-term db keyword-search]
-  (if (= ((first db) (keyword keyword-search)) search-term)
+#_(defn find-project [keyword-term search-term db]
+  (if (= ((first db) keyword-term) search-term)
     (first db)
-    (project-finder search-term (rest db) keyword-search)))
+    (find-project keyword-term search-term (rest db))))
+
+(defn find-project [keyword-term search-term db]
+  (cond
+    (empty? db) nil
+    (= ((first db) keyword-term) search-term) (first db)
+    :else (find-project keyword-term search-term (rest db))))
+
+;; (find-project :title "2018 Researcher in Residence" (:awards (x :exhibitions)))
+
+;; (find-project :title "2017 Researcher in Residence" (:awards (x :exhibitions)))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Static Layouts ;;
@@ -146,24 +156,20 @@
        (div {:class "col-xs-12"}
             (p (bio/biography :summary)))))
 
-;;;;;;;;;;;;;;;;;;;;
-;; Layout: Awards ;;
-;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Get Selected Items From a Category   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn get-selected-awards [exhib] exhib)
 
 
-
-;;;;;;;;;;;;;;;;;;;;
-;; Experience     ;;
-;;;;;;;;;;;;;;;;;;;;
-
-(defn experience [proj employ]
-  (let [btf          (project-finder "Beyond the Frame" (employ :employers) "title")
-        nextjournal  (project-finder "Nextjournal" (employ :employers) "title")
-        penguin      (project-finder "Penguin Random House" (employ :employers) "title")
-        netgalley    (project-finder "NetGalley" (employ :employers) "title")
-        ef-sharp     (project-finder "F#" (employ :employers) "title")]
+(defn experience [employ]
+  (let [db           (employ :employers)
+        btf          (find-project :title "Beyond the Frame" db)
+        nextjournal  (find-project :title "Nextjournal" db)
+        penguin      (find-project :title "Penguin Random House" db)
+        netgalley    (find-project :title "NetGalley" db)
+        ef-sharp     (find-project :title "F#" db)]
 
     (div {:class "row"}
          (section-header "Experience" "experience-section-header")
@@ -173,73 +179,54 @@
 ;; Academic       ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-;; Update database
-
-(defn academy [exhib talk]
-  (let [nu   (project-finder "Northwestern University" (exhib :education) "subtitle")
-        uni  (project-finder "University of Northern Iowa" (exhib :education) "subtitle")
-        stevens (project-finder "Stevens Institute of Technology" (talk :talks) "title")
-        ia   (project-finder "Illinois Institute of Art" (talk :talks) "title")
-        ccc  (project-finder "Columbia College Chicago" (talk :talks) "title")
-        iadt (project-finder "International Academy of Design and Technology" (talk :talks) "title")]
-    (div {:class "row"}
-         (section-header "Academic Experience")
-         (div {:class "row"}
-              (three-column-layout (stevens :subtitle) (stevens :title) (stevens :location))
-              (three-column-layout (ia :subtitle) (ia :title) (ia :location))
-              (three-column-layout (iadt :subtitle) (iadt :title) (iadt :location)))
-         (div {:class "row"}
-              (three-column-layout (ccc :subtitle) (ccc :title) (ccc :location))
-              (three-column-layout (nu :subtitle) (nu :title) (nu :concentrations))
-              (three-column-layout (uni :subtitle) (uni :title) (uni :concentrations)))
-)))
-
-(defn academy-horiz [exhib]
-  (let [nu (project-finder "Northwestern University" (exhib :education) "subtitle")
-        uni (project-finder "University of Northern Iowa" (exhib :education) "subtitle")]
-    (div {:class "row"}
-         (section-header "Education")
-         (two-column-layout (nu :subtitle) (nu :title) (nu :technology))
-         (two-column-layout (uni :subtitle) (uni :title) (uni :technology)))))
-
 (defn public-speaking [talk]
-  (let [curry-on (project-finder "Curry On, London, England" (talk :talks) "location")
-        pycon    (project-finder "PyCon/PyData, Berlin, Germany" (talk :talks) "location")
-        computation   (project-finder "Society for the History of Technology, Milan, Italy" (talk :talks) "location")
-        internet      (project-finder "New York City" (talk :talks) "location")
-        strangeloop   (project-finder "Strange Loop, St. Louis, MO" (talk :talks) "location")
-        creative-code (project-finder "Creative Coding NYC" (talk :talks) "location")
-        anthropology (project-finder "Enabling Digital Anthropology" (talk :talks) "title")
-        intended    (project-finder "Intended Knowledge?" (talk :talks) "title")
-        sigcis      (project-finder "Stored In Memory: The 10th Annual SIGCIS Conference, St. Louis, MO" (talk :talks) "location")
-        clj-conj    (project-finder "Clojure/conj, Austin, TX" (talk :talks) "location")
-        vcfmw       (project-finder "Accidentally Arming a Hacker Revolution" (talk :talks) "title")
-        unlikely    (project-finder "Unlikely Harbingers" (talk :talks) "title")
-        i-take      (project-finder "I T.A.K.E Unconference (Keynote), Bucharest, Romania" (talk :talks) "location")
-        clj-brdg    (project-finder "ClojureBridge New York City" (talk :talks) "location")
-        modes       (project-finder "The Grammar of the Internet" (talk :talks) "title")
-        nycdh       (project-finder "New York City Digital Humanities Festival" (talk :talks) "location")
-        c-base      (project-finder "Harvesting Human Intelligence" (talk :talks) "title")
-        pecha       (project-finder "Computers & Intimacy" (talk :talks) "title")]
+  (let [db (talk :talks)
+        curry-on    (find-project :location "Curry On, London, England" db)
+        pycon       (find-project :location "PyCon/PyData, Berlin, Germany" db)
+        computation (find-project :location "Society for the History of Technology, Milan, Italy" db)
+        internet    (find-project :location "New York City" db)
+        strangeloop (find-project :location "Strange Loop, St. Louis, MO" db)
+        creative-code (find-project :location "Creative Coding NYC" db)
+        anthropology  (find-project :title "Enabling Digital Anthropology" db)
+        intended      (find-project :title "Intended Knowledge?" db)
+        sigcis      (find-project :location "Stored In Memory: The 10th Annual SIGCIS Conference, St. Louis, MO" db)
+        clj-conj    (find-project :location "Clojure/conj, Austin, TX" db)
+        vcfmw       (find-project :title "Accidentally Arming a Hacker Revolution" db)
+        unlikely    (find-project :title "Unlikely Harbingers" db)
+        i-take      (find-project :location "I T.A.K.E Unconference (Keynote), Bucharest, Romania" db)
+        clj-brdg    (find-project :location "ClojureBridge New York City" db)
+        nycdh       (find-project :location "New York City Digital Humanities Festival" db)
+        modes       (find-project :title "The Grammar of the Internet" db)
+        c-base      (find-project :title "Harvesting Human Intelligence" db)
+        pecha       (find-project :title "Computers & Intimacy" db)]
 
     (div {:class "row"}
          (section-header "Selected Public Speaking Experience")
          (two-col-list-layout speaking-publication-award-layout [curry-on pycon strangeloop anthropology clj-conj i-take clj-brdg])
          (two-col-list-layout speaking-publication-award-layout [computation internet modes creative-code sigcis nycdh c-base]))))
 
-(defn teaching [talk]
-  (let [stevens   (project-finder "Stevens Institute of Technology" (talk :talks) "title")
-        ai        (project-finder "Illinois Institute of Art" (talk :talks) "title")
-        ccc       (project-finder "Columbia College Chicago" (talk :talks) "title")
-        iadt      (project-finder "International Academy of Design and Technology" (talk :talks) "title")]
+(defn academy-horiz [exhib]
+  (let [db (exhib :education)
+        nu (find-project :subtitle "Northwestern University" db)
+        uni (find-project :subtitle "University of Northern Iowa" db)]
+    (div {:class "row"}
+         (section-header "Education")
+         (two-column-layout (nu :subtitle) (nu :title) (nu :technology))
+         (two-column-layout (uni :subtitle) (uni :title) (uni :technology)))))
 
+(defn teaching [talk]
+  (let [db      (talk :talks)
+        stevens (find-project :title "Stevens Institute of Technology" db)
+        ai      (find-project :title "Illinois Institute of Art" db)
+        ccc     (find-project :title "Columbia College Chicago" db)
+        iadt    (find-project :title "International Academy of Design and Technology" db)]
     (div {:class "row"}
          (section-header "Research and Teaching Experience" "experience-section-header")
          (reduce str (clojure.core/map #(single-column-layout %) [stevens ai iadt ccc])))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Display Entire Category   ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Get All Items From a Category   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn get-all-cv-items
   "Get all cv items and put them in two columns. If there is an odd number, `take` and `drop` always round up, so the first column gets the extra item"
@@ -270,7 +257,7 @@
   (div
    (summary-layout) ;; summary header
 
-   (experience (data-set :projects) (data-set :employment))
+   (experience (data-set :employment))
    (small "&nbsp;")
 
    (teaching (data-set :talks))
