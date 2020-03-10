@@ -1,9 +1,9 @@
 
 
-/* @base-bg: #fdf6b6; /\* yellow *\/ */
+/* @base-bg: #fdf9d3; /\* yellow *\/ */
 /* @dark-compliment: #2700B2; /\* dark blue *\/ */
 /* @lite-complement: #6B29FF; /\* light blue *\/ */
-/* @contrasting-red: #843853; /\* dark red *\/ */
+/* @contrasting-red: #6B4752; /\* dark red *\/ */
 /* Colors: http://adobe.ly/2amTsZQ */
 
 body {
@@ -30,16 +30,22 @@ header h1, header h2 {
 header h2 { letter-spacing: 2px !important;;}
 header h3 { margin: 0px; }
 h3, h4 { color: #333; }
-h4.section-header { padding-bottom: 0.8em; }
-h4.experience-section-header { padding-bottom: 0em; }
-h4 > small { font-size: 10.25px; }
+h2.section-header{
+    padding-bottom: 0.8em;
+    color: #444;
+}
+h3 > small { font-size: 10.25px; }
 
 
 h1 { color: #2700B2 !important; }
-h2 { color: #6B29FF !important; }
-h2 small, h3 small, h4 small, .contact-info, table { color: #843853 !important; }
+h2 { color: #6B29FF; }
+h2 small, h3 small, h4 small, .contact-info, table {
+    color: #6B4752 !important;
+    font-family: sans-serif;
+    font-weight: normal;
+}
 
-p.section-header { color: #843853 !important; font-size: 11px; }
+p.section-header { color: #6B4752 !important; font-size: 11px; }
 
 table { font-size: 12px; }
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
@@ -48,8 +54,8 @@ table { font-size: 12px; }
     padding: 4px;
 }
 
-#inner { background: #fdf6b6 !important; border-top: solid #673BFF 8px; }
-/* #bd { background: #fdf6b6 !important; } */
+#inner { background: #fdf9d3 !important; border-top: solid #673BFF 8px; }
+/* #bd { background: #fdf9d3 !important; } */
 #bd h2, #bd h3, #bd h4 { margin: 0 0 8px; }
 
 footer > .container { border-top: solid #673BFF 2px; padding: 10px; }
@@ -86,13 +92,15 @@ footer > .container { border-top: solid #673BFF 2px; padding: 10px; }
 }
 
 .two-col-list .date {
-        color: #843853;
-        font-size: .86em;
-    }
+    color: #6B4752;
+    font-size: .86em;
+    font-family: sans-serif;
+    font-weight: normal;
+}
 
 @media print {
     body {
-        background: #fdf6b6 !important;
+        background: #fdf9d3 !important;
     }
 
     header h1, header h2 { text-transform: uppercase;
@@ -106,8 +114,8 @@ footer > .container { border-top: solid #673BFF 2px; padding: 10px; }
     .table td,
     .table th,
     span.glyphicon {
-      background-color: #fdf6b6 !important;
-      color: #843853 !important;
+        background-color: #fdf9d3 !important;
+        color: #6B4752 !important;
      }
 
     a,

@@ -61,7 +61,7 @@
 
 (defn section-header [header-name & additional-class]
   (div {:class "col-xs-12"}
-       (h4 {:class (str "text-center section-header " (first additional-class))} header-name)))
+       (h2 {:class (str "text-center section-header " (first additional-class))} header-name)))
 
 (defn make-list [description]
   "I create a HTML list. I expect a string of data delimited by semicolons."
@@ -109,11 +109,21 @@
        (ul {:class "list-unstyled"}
            (list-achievements list-column  "" template))))
 
-(defn speaking-publication-layout [{:keys [title date location publication]}]
+;; TODO: simplify model
+(defn speaking-publication-award-layout
+  "Layout for awards, publications, and speaking engagements. Handles data variations.
+   ---
+   `location`: for speaking engagements OR
+   `publication`: for publications OR
+   `org`: for awards
+   ---
+   `date`: date of event/publication OR
+   `type`: type of award"
+  [{:keys [title date location publication org type]}]
   (li
    (div (strong title))
-   (div (or location publication))
-   (div (small {:class "date"} date))))
+   (div (or location publication org))
+   (div (small {:class "date"} (or date type)))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Talent Header  ;;
@@ -140,22 +150,9 @@
 ;; Layout: Awards ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(defn award-layout [award]
-  (li
-   (if (= (award :highlight) "strong")
-     (p {:class "highlight"} (strong (award :title)))
-     (p (strong (award :title))))
-   (p (award :org) "(" (award :type) ")")))
+(defn get-selected-awards [exhib] exhib)
 
-(def awards
-  (fn [exhib] (let [award-list (exhib :awards)
-               number-of-awards (count award-list)
-               half (math/ceil (/ number-of-awards 2))
-               html-awards ""]
-           (div {:class "row"}
-                (section-header "Selected Awards")
-                (two-col-list-layout award-layout (take half award-list))
-                (two-col-list-layout award-layout (drop half award-list))))))
+
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Experience     ;;
@@ -169,7 +166,7 @@
         ef-sharp     (project-finder "F#" (employ :employers) "title")]
 
     (div {:class "row"}
-         (section-header "Selected Experience" "experience-section-header")
+         (section-header "Experience" "experience-section-header")
          (reduce str (clojure.core/map #(single-column-layout %) [nextjournal btf penguin netgalley ef-sharp])))))
 
 ;;;;;;;;;;;;;;;;;;;;
@@ -186,7 +183,7 @@
         ccc  (project-finder "Columbia College Chicago" (talk :talks) "title")
         iadt (project-finder "International Academy of Design and Technology" (talk :talks) "title")]
     (div {:class "row"}
-         (section-header "Selected Academic Experience")
+         (section-header "Academic Experience")
          (div {:class "row"}
               (three-column-layout (stevens :subtitle) (stevens :title) (stevens :location))
               (three-column-layout (ia :subtitle) (ia :title) (ia :location))
@@ -227,8 +224,8 @@
 
     (div {:class "row"}
          (section-header "Selected Public Speaking Experience")
-         (two-col-list-layout speaking-publication-layout [curry-on pycon strangeloop anthropology clj-conj i-take clj-brdg])
-         (two-col-list-layout speaking-publication-layout [computation internet modes creative-code sigcis nycdh c-base]))))
+         (two-col-list-layout speaking-publication-award-layout [curry-on pycon strangeloop anthropology clj-conj i-take clj-brdg])
+         (two-col-list-layout speaking-publication-award-layout [computation internet modes creative-code sigcis nycdh c-base]))))
 
 (defn teaching [talk]
   (let [stevens   (project-finder "Stevens Institute of Technology" (talk :talks) "title")
@@ -240,53 +237,32 @@
          (section-header "Research and Teaching Experience" "experience-section-header")
          (reduce str (clojure.core/map #(single-column-layout %) [stevens ai iadt ccc])))))
 
-;;;;;;;;;;;;;;;;;;;;
-;; Publications   ;;
-;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Display Entire Category   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-#_(defn publications [exhib]
-  (let [pub-list (exhib :publications)
-        html-pub ""
-        first-2-pubs (take 2 pub-list)
-        second-2-pubs (take 2 (drop 2 pub-list))]
-    (div {:class "row"}
-         (section-header "Selected Publications")
-         (two-col-list-layout speaking-publication-layout first-2-pubs)
-         (two-col-list-layout speaking-publication-layout second-2-pubs))))
+(defn get-all-cv-items
+  "Get all cv items and put them in two columns. If there is an odd number, `take` and `drop` always round up, so the first column gets the extra item"
+  [cv-items layout-style]
+  (let [num-of-cv-items (count cv-items)
+        one-column (partial two-col-list-layout layout-style)]
+    (div
+     (one-column (take (/ num-of-cv-items 2) cv-items))
+     (one-column (drop (/ num-of-cv-items 2) cv-items)))))
 
-(defn publications [{:keys [publications]}]
-  (let [num-of-publications (count publications)
-        one-column (partial two-col-list-layout speaking-publication-layout)]
-    (div {:class "row"}
-         (section-header "Selected Publications")
-         (one-column (take (/ num-of-publications 2) publications))
-         (one-column (drop (/ num-of-publications 2) publications)))))
+(defn get-all-publications [{:keys [publications]}]
+  (div {:class "row"}
+       (section-header "Publications")
+       (get-all-cv-items publications speaking-publication-award-layout)))
+
+(defn get-all-awards [{:keys [awards]}]
+  (div {:class "row"}
+       (section-header "Awards")
+       (get-all-cv-items awards speaking-publication-award-layout)))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Sub-Layouts    ;;
 ;;;;;;;;;;;;;;;;;;;;
-
-(defn cv-sub-layout [data-set]
-  (div
-   (summary-layout) ;; summary header
-   (hr-)
-
-   (experience (data-set :projects) (data-set :employment))
-   (hr- )
-
-   (div (public-speaking (data-set :talks)))
-   (hr- )
-
-   (publications (data-set :exhibitions))
-   (hr-)
-
-   ;; (div {:class "page-breaker"})
-   (awards (data-set :exhibitions))
-   (hr-)
-
-   #_(div (teaching (data-set :talks)))
-
-   ))
 
 ;; Programming
 
@@ -297,23 +273,18 @@
    (experience (data-set :projects) (data-set :employment))
    (small "&nbsp;")
 
-   (div (teaching (data-set :talks)))
+   (teaching (data-set :talks))
 
-   (div (public-speaking (data-set :talks)))
+   (public-speaking (data-set :talks))
    (small "&nbsp;")
 
-   (publications (data-set :exhibitions))
+   (get-all-publications (data-set :exhibitions))
    (small "&nbsp;")
 
-;;   (academy (data-set :exhibitions) (data-set :talks))
+   (get-all-awards (data-set :exhibitions))
    (small "&nbsp;")
 
    (academy-horiz (data-set :exhibitions))
-
-
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   ;; 3 columns of academic experience
-   ;; (academy (data-set :exhibitions) (data-set :talks))
 
    ))
 
@@ -323,18 +294,6 @@
   (div
 
    (talent-layout) ;; alternative header: 3 columns listing talents
-   (hr-)
-
-   #_(div (teaching (data-set :talks)))
-
-   ;;(div {:class "page-breaker"})
-
-   (div (public-speaking (data-set :talks)))
-
-   (publications (data-set :exhibitions))
-   (hr-)
-
-   (awards (data-set :exhibitions))
    (hr-)
 
    (academy-horiz (data-set :exhibitions))))
@@ -364,7 +323,6 @@
           ;;;;;;;;;;;;;;;;;;
           ;; Document Body
           (div {:id "bd"}
-               #_(cv-sub-layout data-set)
                (programming-sub-layout data-set)
                #_(teaching-sub-layout data-set)))
 
