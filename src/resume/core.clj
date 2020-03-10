@@ -23,20 +23,11 @@
       (desc-itemizer matcher-object (str points (li {:class "qualification"} single-point)))
       points)))
 
-#_(defn find-project [keyword-term search-term db]
-  (if (= ((first db) keyword-term) search-term)
-    (first db)
-    (find-project keyword-term search-term (rest db))))
-
 (defn find-project [keyword-term search-term db]
   (cond
     (empty? db) nil
     (= ((first db) keyword-term) search-term) (first db)
     :else (find-project keyword-term search-term (rest db))))
-
-;; (find-project :title "2018 Researcher in Residence" (:awards (x :exhibitions)))
-
-;; (find-project :title "2017 Researcher in Residence" (:awards (x :exhibitions)))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Static Layouts ;;
@@ -160,26 +151,24 @@
 ;; Get Selected Items From a Category   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn get-selected-awards [exhib] exhib)
-
-
-(defn experience [employ]
-  (let [db           (employ :employers)
-        btf          (find-project :title "Beyond the Frame" db)
-        nextjournal  (find-project :title "Nextjournal" db)
-        penguin      (find-project :title "Penguin Random House" db)
-        netgalley    (find-project :title "NetGalley" db)
-        ef-sharp     (find-project :title "F#" db)]
-
+(defn get-selected-awards [exhib]
+  (let [db (exhib :awards)
+        residency-2018 (find-project :title "2018 Researcher in Residence" db)
+        residency-2017 (find-project :title "2017 Space:Light Artist Residency" db)
+        residency-2015 (find-project :title "Berlin/New York 2015 Media Residency Program" db)
+        co-lab (find-project :title "Interactive Co/Lab 2016, Detroit, MI" db)
+        pov-9  (find-project :title "POV Hackathon 9, Chicago, IL" db)
+        pov-7  (find-project :title "POV Hackathon 7, New York, NY" db)
+        imagination-2003 (find-project :title "Program for the Study of the Imagination 2003" db)
+        tribeca-2013  (find-project :title "Tribeca Hacks 2013, New York, NY" db)
+        director-2014 (find-project :org "Red Hook Film Festival 2014" db)
+        director-2012 (find-project :org "Filmstock Film Festival 2012" db)]
     (div {:class "row"}
-         (section-header "Experience" "experience-section-header")
-         (reduce str (clojure.core/map #(single-column-layout %) [nextjournal btf penguin netgalley ef-sharp])))))
+         (section-header "Selected Awards")
+         (two-col-list-layout speaking-publication-award-layout [residency-2018 residency-2017 residency-2015 co-lab pov-9 ])
+         (two-col-list-layout speaking-publication-award-layout [pov-7 director-2014 tribeca-2013 director-2012 imagination-2003]))))
 
-;;;;;;;;;;;;;;;;;;;;
-;; Academic       ;;
-;;;;;;;;;;;;;;;;;;;;
-
-(defn public-speaking [talk]
+(defn get-selected-public-speaking [talk]
   (let [db (talk :talks)
         curry-on    (find-project :location "Curry On, London, England" db)
         pycon       (find-project :location "PyCon/PyData, Berlin, Germany" db)
@@ -205,7 +194,7 @@
          (two-col-list-layout speaking-publication-award-layout [curry-on pycon strangeloop anthropology clj-conj i-take clj-brdg])
          (two-col-list-layout speaking-publication-award-layout [computation internet modes creative-code sigcis nycdh c-base]))))
 
-(defn academy-horiz [exhib]
+(defn get-selected-academy-horiz [exhib]
   (let [db (exhib :education)
         nu (find-project :subtitle "Northwestern University" db)
         uni (find-project :subtitle "University of Northern Iowa" db)]
@@ -214,7 +203,7 @@
          (two-column-layout (nu :subtitle) (nu :title) (nu :technology))
          (two-column-layout (uni :subtitle) (uni :title) (uni :technology)))))
 
-(defn teaching [talk]
+(defn get-selected-teaching [talk]
   (let [db      (talk :talks)
         stevens (find-project :title "Stevens Institute of Technology" db)
         ai      (find-project :title "Illinois Institute of Art" db)
@@ -247,35 +236,37 @@
        (section-header "Awards")
        (get-all-cv-items awards speaking-publication-award-layout)))
 
+(defn get-all-experience [employ]
+  (div {:class "row"}
+       (section-header "Experience" "experience-section-header")
+       (reduce str (clojure.core/map #(single-column-layout %) (employ :employers)))))
+
 ;;;;;;;;;;;;;;;;;;;;
 ;; Sub-Layouts    ;;
 ;;;;;;;;;;;;;;;;;;;;
-
-;; Programming
 
 (defn programming-sub-layout [data-set]
   (div
    (summary-layout) ;; summary header
 
-   (experience (data-set :employment))
+   (get-all-experience (data-set :employment))
    (small "&nbsp;")
 
-   (teaching (data-set :talks))
+   (get-selected-teaching (data-set :talks))
 
-   (public-speaking (data-set :talks))
+   (get-selected-public-speaking (data-set :talks))
    (small "&nbsp;")
 
    (get-all-publications (data-set :exhibitions))
    (small "&nbsp;")
 
-   (get-all-awards (data-set :exhibitions))
+   ;;(get-all-awards (data-set :exhibitions))
+   ;;(small "&nbsp;")
+
+   (get-selected-awards (data-set :exhibitions))
    (small "&nbsp;")
 
-   (academy-horiz (data-set :exhibitions))
-
-   ))
-
-;; Teaching
+   (get-selected-academy-horiz (data-set :exhibitions))))
 
 (defn teaching-sub-layout [data-set]
   (div
@@ -283,7 +274,7 @@
    (talent-layout) ;; alternative header: 3 columns listing talents
    (hr-)
 
-   (academy-horiz (data-set :exhibitions))))
+   (get-selected-academy-horiz (data-set :exhibitions))))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Main Layout    ;;
@@ -314,3 +305,17 @@
                #_(teaching-sub-layout data-set)))
 
      (resume-footer))))))
+
+
+(comment
+  (def x (get-data))
+  (find-project :title "2018 Researcher in Residence" (:awards (x :exhibitions)))
+
+         :title = "2018 Researcher in Residence"
+         :type = "Residency"
+         :org = "Signal Culture"
+
+  (find-project :title "2017 Researcher in Residence" (:awards (x :exhibitions)))
+
+  => nil
+  )
